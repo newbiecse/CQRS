@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>CqrsDemo.DatabaseInitializer</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.11" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\BuildingBlocks\CqrsDemo.BuildingBlocks.EventStore\CqrsDemo.BuildingBlocks.EventStore.csproj" />
+    <ProjectReference Include="..\..\src\CqrsDemo.Commands.Infrastructure\CqrsDemo.Commands.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\CqrsDemo.Queries.Infrastructure\CqrsDemo.Queries.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Services\Cart\Cart.Infrastructure\Cart.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Services\Order\Order.Infrastructure\Order.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Services\Payment\Payment.Infrastructure\Payment.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Services\Product\Product.Infrastructure\Product.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Services\Reporting\Reporting.Infrastructure\Reporting.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Services\Saga\CheckoutSaga.Infrastructure\CheckoutSaga.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Services\User\User.Infrastructure\User.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>

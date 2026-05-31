@@ -175,10 +175,10 @@ Order is **not** created inside Cart. Cart only emits `cart.checked-out.v1`; **O
 ```mermaid
 sequenceDiagram
     participant CartAPI as Cart.Commands
-    participant CartES as Cart_Write
+    participant CartES as CqrsDemo_Cart_Write
     participant Bus as shop-events
     participant OInt as Order.Integration.Worker
-    participant OrderES as Order_Write
+    participant OrderES as CqrsDemo_Order_Write
     participant Bus2 as shop-events
 
     CartAPI->>CartES: CheckoutCartCommandHandler
@@ -291,7 +291,7 @@ sequenceDiagram
     participant PayAPI as Payment.Commands
     participant Handler as PayOrderCommandHandler
     participant OQ as Order.Queries (HTTP)
-    participant PayES as Payment_Write
+    participant PayES as CqrsDemo_Payment_Write
     participant Bus as shop-events
 
     Saga->>PayAPI: POST /api/orders/{id}/pay

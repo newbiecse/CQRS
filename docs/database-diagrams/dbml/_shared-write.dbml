@@ -1,5 +1,5 @@
 // Shared write schema — copy into each service write DB on SQL Server
-// Product_Write | Cart_Write | Order_Write | Payment_Write
+// CqrsDemo_Product_Write | CqrsDemo_Cart_Write | CqrsDemo_Order_Write | CqrsDemo_Payment_Write
 
 Table StoredEvents {
   Id uniqueidentifier [pk]

@@ -34,7 +34,7 @@ CheckoutSaga.Api (:5205)
   │ 1. HTTP POST Cart.Commands /checkout
   │ 2. Persist saga state (CartCheckedOut)
   ▼
-Cart_Write ──outbox──► shop-events ──► Order.Integration ──► Order_Write (order.created)
+CqrsDemo_Cart_Write ──outbox──► shop-events ──► Order.Integration ──► CqrsDemo_Order_Write (order.created)
   │
   ▼ CheckoutSaga.Worker (subscription: checkout-saga-orchestration)
   │ 3. On order.created → HTTP POST Payment.Commands /pay

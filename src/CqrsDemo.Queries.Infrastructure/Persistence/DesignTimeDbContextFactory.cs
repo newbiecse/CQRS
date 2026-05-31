@@ -10,7 +10,7 @@ public sealed class ReadDbContextFactory : IDesignTimeDbContextFactory<ReadDbCon
     {
         var optionsBuilder = new DbContextOptionsBuilder<ReadDbContext>();
         optionsBuilder.UseSqlServer(
-            "Server=localhost,1433;Database=CqrsDemo_Read;User Id=sa;Password=Your_password123;TrustServerCertificate=True;");
+            "Server=localhost;database=CqrsDemo_Read;Trusted_Connection=False;persist security info=True;Integrated Security=SSPI;");
 
         return new ReadDbContext(optionsBuilder.Options);
     }

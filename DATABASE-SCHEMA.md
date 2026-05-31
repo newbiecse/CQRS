@@ -538,9 +538,9 @@ flowchart LR
 |----------|----------------------|
 | All `*_Write` | `BuildingBlocks/.../EventStoreDbContext.cs`, `StoredEventEntity`, `OutboxMessageEntity` |
 | `Product_Read` | `Product.Infrastructure/.../ProductReadDbContext.cs` |
-| `Cart_Read` | `Cart.Infrastructure/.../CartReadDbContext.cs` |
-| `Order_Read` | `Order.Infrastructure/.../OrderReadDbContext.cs` |
-| `Payment_Read` | `Payment.Infrastructure/.../PaymentReadDbContext.cs` |
+| `CqrsDemo_Cart_Read` | `Cart.Infrastructure/.../CartReadDbContext.cs` |
+| `CqrsDemo_Order_Read` | `Order.Infrastructure/.../OrderReadDbContext.cs` |
+| `CqrsDemo_Payment_Read` | `Payment.Infrastructure/.../PaymentReadDbContext.cs` |
 | `Saga` | `CheckoutSaga.Infrastructure/.../CheckoutSagaDbContext.cs` |
 
 ---

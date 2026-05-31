@@ -10,7 +10,7 @@ public sealed class WriteDbContextFactory : IDesignTimeDbContextFactory<WriteDbC
     {
         var optionsBuilder = new DbContextOptionsBuilder<WriteDbContext>();
         optionsBuilder.UseSqlServer(
-            "Server=localhost,1433;Database=CqrsDemo_Write;User Id=sa;Password=Your_password123;TrustServerCertificate=True;");
+            "Server=localhost;database=CqrsDemo_Write;Trusted_Connection=False;persist security info=True;Integrated Security=SSPI;");
 
         return new WriteDbContext(optionsBuilder.Options);
     }
