@@ -1,0 +1,115 @@
+// All microservices — import at https://dbdiagram.io
+// Write DBs use identical StoredEvents + OutboxMessages (shown once per domain for clarity)
+
+Project cqrs_distributed {
+  database_type: 'SQL Server'
+}
+
+// Product
+Table product_StoredEvents {
+  Id uniqueidentifier [pk]
+  StreamId uniqueidentifier
+  StreamType nvarchar(100)
+  Version bigint
+  EventType nvarchar(200)
+  Payload nvarchar(max)
+  OccurredOn datetime2
+}
+Table product_OutboxMessages {
+  Id uniqueidentifier [pk]
+  EventType nvarchar(200)
+  Payload nvarchar(max)
+  OccurredOn datetime2
+  ProcessedAt datetime2
+  AttemptCount int
+  LastError nvarchar(2000)
+}
+Table product_Products {
+  Id uniqueidentifier [pk]
+  Name nvarchar(200)
+  Price decimal(18,2)
+  CreatedAt datetime2
+  LastUpdatedAt datetime2
+}
+
+// Cart read
+Table cart_Carts {
+  Id uniqueidentifier [pk]
+  CustomerId uniqueidentifier
+  Status nvarchar(50)
+  Subtotal decimal(18,2)
+  CreatedAt datetime2
+  LastUpdatedAt datetime2
+}
+Table cart_CartLines {
+  Id uniqueidentifier [pk]
+  CartId uniqueidentifier [ref: > cart_Carts.Id]
+  ProductId uniqueidentifier
+  ProductName nvarchar(200)
+  UnitPrice decimal(18,2)
+  Quantity int
+}
+
+// Order read
+Table order_Orders {
+  Id uniqueidentifier [pk]
+  CustomerId uniqueidentifier
+  CartId uniqueidentifier
+  Status nvarchar(50)
+  TotalAmount decimal(18,2)
+  PaymentId uniqueidentifier
+  CreatedAt datetime2
+  LastUpdatedAt datetime2
+}
+Table order_OrderLines {
+  Id uniqueidentifier [pk]
+  OrderId uniqueidentifier [ref: > order_Orders.Id]
+  ProductId uniqueidentifier
+  ProductName nvarchar(200)
+  UnitPrice decimal(18,2)
+  Quantity int
+}
+
+// Payment read
+Table payment_Payments {
+  Id uniqueidentifier [pk]
+  OrderId uniqueidentifier
+  Amount decimal(18,2)
+  Status nvarchar(50)
+  FailureReason nvarchar(500)
+  InitiatedAt datetime2
+  LastUpdatedAt datetime2
+}
+
+// Saga
+Table saga_CheckoutSagas {
+  Id uniqueidentifier [pk]
+  CartId uniqueidentifier
+  OrderId uniqueidentifier
+  PaymentId uniqueidentifier
+  SimulatePaymentFailure bit
+  State nvarchar(64)
+  FailureReason nvarchar(2000)
+  CreatedAt datetime2
+  UpdatedAt datetime2
+}
+
+TableGroup product [note: 'CqrsDemo_Product'] {
+  product_StoredEvents
+  product_OutboxMessages
+  product_Products
+}
+TableGroup cart [note: 'CqrsDemo_Cart_Read'] {
+  cart_Carts
+  cart_CartLines
+}
+TableGroup order [note: 'CqrsDemo_Order_Read'] {
+  order_Orders
+  order_OrderLines
+}
+TableGroup payment [note: 'CqrsDemo_Payment_Read'] {
+  payment_Payments
+}
+TableGroup saga_db [note: 'CqrsDemo_Saga'] {
+  saga_CheckoutSagas
+}

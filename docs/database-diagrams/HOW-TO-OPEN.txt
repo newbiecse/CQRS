@@ -1,0 +1,30 @@
+CQRS Demo — Database diagrams (visual, not Markdown)
+====================================================
+
+OPTION 1 — Browser (easiest)
+----------------------------
+1. Open this file in Finder / Explorer:
+   docs/database-diagrams/index.html
+2. Double-click it (or drag into Chrome / Edge / Firefox).
+3. Use the left menu to jump: Product, Cart, Order, Payment, Saga.
+   Each table shows every column, types, PK/FK/NN badges.
+
+OPTION 2 — dbdiagram.io (interactive ERD)
+-----------------------------------------
+1. Go to https://dbdiagram.io
+2. New diagram → Import → select a file from:
+   docs/database-diagrams/dbml/
+     product.dbml   — Product write + read
+     cart.dbml      — Cart write + read
+     order.dbml     — Order write + read
+     payment.dbml   — Payment write + read
+     saga.dbml      — Saga only
+     all-services.dbml — overview of all read models + saga
+3. Pan/zoom/export PNG or PDF from the site.
+
+OPTION 3 — VS Code extension
+------------------------------
+Install "DBML Entity Relationship Diagram" or open index.html with Live Preview.
+
+Write databases (Product/Cart/Order/Payment) share StoredEvents + OutboxMessages.
+See DATABASE-SCHEMA.md in repo root for narrative documentation.

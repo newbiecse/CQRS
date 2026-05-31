@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CQRS Demo — Database Diagrams</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --panel: #1a2332;
+      --border: #2d3a4f;
+      --text: #e7ecf3;
+      --muted: #8b9cb3;
+      --pk: #f59e0b;
+      --fk: #3b82f6;
+      --idx: #10b981;
+      --write: #6366f1;
+      --read: #14b8a6;
+      --saga: #ec4899;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      min-height: 100vh;
+    }
+    nav {
+      width: 220px;
+      background: var(--panel);
+      border-right: 1px solid var(--border);
+      padding: 1.25rem 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+    nav h1 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      padding: 0 1rem 0.75rem;
+      margin: 0;
+    }
+    nav a {
+      display: block;
+      padding: 0.5rem 1rem;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 0.95rem;
+      border-left: 3px solid transparent;
+    }
+    nav a:hover { background: rgba(255,255,255,0.05); }
+    nav a.active { border-left-color: var(--write); background: rgba(99,102,241,0.15); }
+    main {
+      flex: 1;
+      padding: 2rem 2.5rem 4rem;
+      max-width: 1200px;
+    }
+    .service-header {
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .service-header h2 { margin: 0 0 0.35rem; font-size: 1.75rem; }
+    .service-header p { margin: 0; color: var(--muted); font-size: 0.95rem; }
+    .db-block { margin-bottom: 2.5rem; }
+    .db-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 1rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+    }
+    .db-label.write { background: rgba(99,102,241,0.25); color: #a5b4fc; }
+    .db-label.read { background: rgba(20,184,166,0.2); color: #5eead4; }
+    .db-label.saga { background: rgba(236,72,153,0.2); color: #f9a8d4; }
+    .diagram-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      align-items: flex-start;
+    }
+    .table-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      min-width: 280px;
+      max-width: 360px;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+    }
+    .table-card header {
+      background: #243044;
+      padding: 0.65rem 1rem;
+      font-weight: 700;
+      font-size: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .table-card .meta {
+      padding: 0.4rem 1rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+    }
+    table.cols {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+    }
+    table.cols th {
+      text-align: left;
+      padding: 0.35rem 0.75rem;
+      color: var(--muted);
+      font-weight: 500;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+    }
+    table.cols td {
+      padding: 0.4rem 0.75rem;
+      border-top: 1px solid rgba(45,58,79,0.6);
+      vertical-align: top;
+    }
+    table.cols tr:hover td { background: rgba(255,255,255,0.03); }
+    .col-name { font-family: ui-monospace, monospace; color: #93c5fd; }
+    .badge {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 0.1rem 0.35rem;
+      border-radius: 3px;
+      margin-right: 0.25rem;
+      vertical-align: middle;
+    }
+    .badge.pk { background: var(--pk); color: #1a1a1a; }
+    .badge.fk { background: var(--fk); color: #fff; }
+    .badge.uq { background: var(--idx); color: #1a1a1a; }
+    .badge.nn { background: #475569; color: #e2e8f0; }
+    .rel {
+      display: flex;
+      align-items: center;
+      color: var(--muted);
+      font-size: 1.5rem;
+      padding: 0 0.25rem;
+      user-select: none;
+    }
+    .note-box {
+      background: rgba(99,102,241,0.1);
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      margin-top: 1rem;
+      font-size: 0.88rem;
+      color: var(--muted);
+      max-width: 720px;
+    }
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .overview-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+    }
+    .overview-card strong { display: block; margin-bottom: 0.35rem; }
+    .overview-card span { font-size: 0.8rem; color: var(--muted); font-family: monospace; }
+    section { scroll-margin-top: 1rem; margin-bottom: 4rem; }
+    .open-hint {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <h1>Databases</h1>
+    <a href="#overview" class="active">Overview</a>
+    <a href="#user">User</a>
+    <a href="#product">Product</a>
+    <a href="#cart">Cart</a>
+    <a href="#order">Order</a>
+    <a href="#payment">Payment</a>
+    <a href="#saga">Checkout Saga</a>
+    <a href="#shared-write">Shared write tables</a>
+  </nav>
+
+  <main>
+    <section id="overview">
+      <div class="service-header">
+        <h2>CQRS Distributed — All Databases</h2>
+        <p>Open this file in a browser (double-click <code>index.html</code>). Diagrams show every table and column.</p>
+      </div>
+      <div class="overview-grid">
+        <div class="overview-card"><strong>User</strong><span>Write + Read</span></div>
+        <div class="overview-card"><strong>Product</strong><span>Write + Read</span></div>
+        <div class="overview-card"><strong>Cart</strong><span>Write + Read</span></div>
+        <div class="overview-card"><strong>Order</strong><span>Write + Read</span></div>
+        <div class="overview-card"><strong>Payment</strong><span>Write + Read</span></div>
+        <div class="overview-card"><strong>Saga</strong><span>CqrsDemo_Saga</span></div>
+      </div>
+      <div class="note-box">
+        <strong>Write databases</strong> share the same two tables (<code>StoredEvents</code>, <code>OutboxMessages</code>).
+        Each service uses its own SQL database name. Read databases hold projection tables only.
+      </div>
+    </section>
+
+    <section id="shared-write">
+      <div class="service-header">
+        <h2>Shared write schema</h2>
+        <p>Used by Product, Cart, Order, and Payment command services (separate DB per service).</p>
+      </div>
+      <div class="diagram-row" id="shared-write-tables"></div>
+    </section>
+
+    <section id="user">
+      <div class="service-header">
+        <h2>User microservice</h2>
+        <p>StreamType: <code>User</code> · Ports: Commands 5206, Queries 5216 · Cart/Order <code>CustomerId</code> = <code>Users.Id</code></p>
+      </div>
+      <div class="db-block">
+        <div class="db-label write">CqrsDemo_User_Write</div>
+        <div class="diagram-row" data-write-shared data-stream="User"></div>
+      </div>
+      <div class="db-block">
+        <div class="db-label read">CqrsDemo_User_Read</div>
+        <div class="diagram-row" data-tables='[{"name":"Users","indexes":["UNIQUE Email"],"columns":[{"n":"Id","t":"uniqueidentifier","pk":true},{"n":"Email","t":"nvarchar(320)","nn":true},{"n":"DisplayName","t":"nvarchar(200)","nn":true},{"n":"IsActive","t":"bit","nn":true},{"n":"RegisteredAt","t":"datetime2"},{"n":"LastUpdatedAt","t":"datetime2"}]}]'></div>
+      </div>
+    </section>
+
+    <section id="product">
+      <div class="service-header">
+        <h2>Product microservice</h2>
+        <p>StreamType: <code>Product</code> · Ports: Commands 5201, Queries 5211</p>
+      </div>
+      <div class="db-block">
+        <div class="db-label write">CqrsDemo_Product_Write</div>
+        <div class="diagram-row" data-write-shared data-stream="Product"></div>
+      </div>
+      <div class="db-block">
+        <div class="db-label read">CqrsDemo_Product_Read</div>
+        <div class="diagram-row" data-tables='[{"name":"Products","indexes":[],"columns":[{"n":"Id","t":"uniqueidentifier","pk":true},{"n":"Name","t":"nvarchar(200)","nn":true},{"n":"Price","t":"decimal(18,2)"},{"n":"CreatedAt","t":"datetime2"},{"n":"LastUpdatedAt","t":"datetime2"}]}]'></div>
+      </div>
+    </section>
+
+    <section id="cart">
+      <div class="service-header">
+        <h2>Cart microservice</h2>
+        <p>StreamType: <code>Cart</code> · Ports: Commands 5202, Queries 5212</p>
+      </div>
+      <div class="db-block">
+        <div class="db-label write">CqrsDemo_Cart_Write</div>
+        <div class="diagram-row" data-write-shared data-stream="Cart"></div>
+      </div>
+      <div class="db-block">
+        <div class="db-label read">CqrsDemo_Cart_Read</div>
+        <div class="diagram-row" data-tables='[
+          {"name":"Carts","columns":[{"n":"Id","t":"uniqueidentifier","pk":true},{"n":"CustomerId","t":"uniqueidentifier"},{"n":"Status","t":"nvarchar(50)","nn":true},{"n":"Subtotal","t":"decimal(18,2)"},{"n":"CreatedAt","t":"datetime2"},{"n":"LastUpdatedAt","t":"datetime2"}]},
+          {"name":"CartLines","fk":[{"col":"CartId","ref":"Carts.Id"}],"indexes":["UNIQUE (CartId, ProductId)"],"columns":[{"n":"Id","t":"uniqueidentifier","pk":true},{"n":"CartId","t":"uniqueidentifier","fk":true},{"n":"ProductId","t":"uniqueidentifier"},{"n":"ProductName","t":"nvarchar(200)","nn":true},{"n":"UnitPrice","t":"decimal(18,2)"},{"n":"Quantity","t":"int"}]}
+        ]'></div>
+      </div>
+    </section>
+
+    <section id="order">
+      <div class="service-header">
+        <h2>Order microservice</h2>
+        <p>StreamType: <code>Order</code> · Ports: Commands 5203, Queries 5213</p>
+      </div>
+      <div class="db-block">
+        <div class="db-label write">CqrsDemo_Order_Write</div>
+        <div class="diagram-row" data-write-shared data-stream="Order"></div>
+      </div>
+      <div class="db-block">
+        <div class="db-label read">CqrsDemo_Order_Read</div>
+        <div class="diagram-row" data-tables='[
+          {"name":"Orders","columns":[{"n":"Id","t":"uniqueidentifier","pk":true},{"n":"CustomerId","t":"uniqueidentifier"},{"n":"CartId","t":"uniqueidentifier"},{"n":"Status","t":"nvarchar(50)","nn":true},{"n":"TotalAmount","t":"decimal(18,2)"},{"n":"PaymentId","t":"uniqueidentifier","nullable":true},{"n":"CreatedAt","t":"datetime2"},{"n":"LastUpdatedAt","t":"datetime2"}]},
+          {"name":"OrderLines","fk":[{"col":"OrderId","ref":"Orders.Id","cascade":true}],"columns":[{"n":"Id","t":"uniqueidentifier","pk":true},{"n":"OrderId","t":"uniqueidentifier","fk":true},{"n":"ProductId","t":"uniqueidentifier"},{"n":"ProductName","t":"nvarchar(200)","nn":true},{"n":"UnitPrice","t":"decimal(18,2)"},{"n":"Quantity","t":"int"}]}
+        ]'></div>
+      </div>
+    </section>
+
+    <section id="payment">
+      <div class="service-header">
+        <h2>Payment microservice</h2>
+        <p>StreamType: <code>Payment</code> · Ports: Commands 5204, Queries 5214</p>
+      </div>
+      <div class="db-block">
+        <div class="db-label write">CqrsDemo_Payment_Write</div>
+        <div class="diagram-row" data-write-shared data-stream="Payment"></div>
+      </div>
+      <div class="db-block">
+        <div class="db-label read">CqrsDemo_Payment_Read</div>
+        <div class="diagram-row" data-tables='[{"name":"Payments","indexes":["IX OrderId"],"columns":[{"n":"Id","t":"uniqueidentifier","pk":true},{"n":"OrderId","t":"uniqueidentifier"},{"n":"Amount","t":"decimal(18,2)"},{"n":"Status","t":"nvarchar(50)","nn":true},{"n":"FailureReason","t":"nvarchar(500)","nullable":true},{"n":"InitiatedAt","t":"datetime2"},{"n":"LastUpdatedAt","t":"datetime2"}]}]'></div>
+      </div>
+    </section>
+
+    <section id="saga">
+      <div class="service-header">
+        <h2>Checkout Saga</h2>
+        <p>Process manager state (not event-sourced) · Port: 5205</p>
+      </div>
+      <div class="db-block">
+        <div class="db-label saga">CqrsDemo_Saga</div>
+        <div class="diagram-row" data-tables='[{"name":"CheckoutSagas","indexes":["IX CartId","IX OrderId"],"columns":[{"n":"Id","t":"uniqueidentifier","pk":true},{"n":"CartId","t":"uniqueidentifier"},{"n":"OrderId","t":"uniqueidentifier","nullable":true},{"n":"PaymentId","t":"uniqueidentifier","nullable":true},{"n":"SimulatePaymentFailure","t":"bit"},{"n":"State","t":"nvarchar(64)","nn":true},{"n":"FailureReason","t":"nvarchar(2000)","nullable":true},{"n":"CreatedAt","t":"datetime2"},{"n":"UpdatedAt","t":"datetime2"}]}]'></div>
+      </div>
+    </section>
+  </main>
+
+  <div class="open-hint">Also import <code>dbml/*.dbml</code> at dbdiagram.io</div>
+
+  <script>
+    const WRITE_TABLES = [
+      {
+        name: "StoredEvents",
+        indexes: ["UNIQUE (StreamId, StreamType, Version)"],
+        columns: [
+          { n: "Id", t: "uniqueidentifier", pk: true },
+          { n: "StreamId", t: "uniqueidentifier" },
+          { n: "StreamType", t: "nvarchar(100)", nn: true },
+          { n: "Version", t: "bigint" },
+          { n: "EventType", t: "nvarchar(200)", nn: true },
+          { n: "Payload", t: "nvarchar(max)", nn: true },
+          { n: "OccurredOn", t: "datetime2" }
+        ]
+      },
+      {
+        name: "OutboxMessages",
+        indexes: ["(ProcessedAt, OccurredOn)"],
+        columns: [
+          { n: "Id", t: "uniqueidentifier", pk: true },
+          { n: "EventType", t: "nvarchar(200)", nn: true },
+          { n: "Payload", t: "nvarchar(max)", nn: true },
+          { n: "OccurredOn", t: "datetime2" },
+          { n: "ProcessedAt", t: "datetime2", nullable: true },
+          { n: "AttemptCount", t: "int" },
+          { n: "LastError", t: "nvarchar(2000)", nullable: true }
+        ]
+      }
+    ];
+
+    function renderTable(def) {
+      const card = document.createElement("div");
+      card.className = "table-card";
+      let meta = "";
+      if (def.indexes?.length) meta += "Indexes: " + def.indexes.join("; ");
+      if (def.fk?.length) meta += (meta ? " · " : "") + def.fk.map(f => f.col + " → " + f.ref + (f.cascade ? " CASCADE" : "")).join(", ");
+      card.innerHTML = `
+        <header>${def.name}</header>
+        ${meta ? `<div class="meta">${meta}</div>` : ""}
+        <table class="cols">
+          <thead><tr><th>Column</th><th>Type</th><th></th></tr></thead>
+          <tbody></tbody>
+        </table>`;
+      const tbody = card.querySelector("tbody");
+      def.columns.forEach(c => {
+        const badges = [];
+        if (c.pk) badges.push('<span class="badge pk">PK</span>');
+        if (c.fk) badges.push('<span class="badge fk">FK</span>');
+        if (c.nn) badges.push('<span class="badge nn">NN</span>');
+        if (c.nullable) badges.push('<span style="color:var(--muted);font-size:0.7rem">NULL</span>');
+        tbody.innerHTML += `<tr>
+          <td class="col-name">${c.n}</td>
+          <td>${c.t}</td>
+          <td>${badges.join(" ")}</td>
+        </tr>`;
+      });
+      return card;
+    }
+
+    function renderRow(container, tables, relBetween) {
+      container.innerHTML = "";
+      tables.forEach((t, i) => {
+        if (i > 0 && relBetween) {
+          const rel = document.createElement("div");
+          rel.className = "rel";
+          rel.textContent = "1 — *";
+          rel.title = relBetween;
+          container.appendChild(rel);
+        }
+        container.appendChild(renderTable(t));
+      });
+    }
+
+    document.getElementById("shared-write-tables") && renderRow(
+      document.getElementById("shared-write-tables"), WRITE_TABLES, false);
+
+    document.querySelectorAll("[data-write-shared]").forEach(el => {
+      const stream = el.getAttribute("data-stream");
+      const tables = JSON.parse(JSON.stringify(WRITE_TABLES));
+      tables[0].meta = "StreamType filter: " + stream;
+      renderRow(el, tables, false);
+      const note = document.createElement("div");
+      note.className = "note-box";
+      note.style.width = "100%";
+      note.innerHTML = `<strong>${stream}</strong> aggregates: rows in <code>StoredEvents</code> where <code>StreamType='${stream}'</code>.`;
+      el.parentElement.appendChild(note);
+    });
+
+    document.querySelectorAll("[data-tables]").forEach(el => {
+      const tables = JSON.parse(el.getAttribute("data-tables"));
+      const rel = tables.length > 1 ? tables[0].name + " → " + tables[1].name : null;
+      renderRow(el, tables, rel);
+    });
+
+    document.querySelectorAll("nav a").forEach(a => {
+      a.addEventListener("click", () => {
+        document.querySelectorAll("nav a").forEach(x => x.classList.remove("active"));
+        a.classList.add("active");
+      });
+    });
+  </script>
+</body>
+</html>

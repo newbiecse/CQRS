@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+set -euo pipefail
+export DOTNET_ROOT="${DOTNET_ROOT:-$HOME/.dotnet}"
+export PATH="$DOTNET_ROOT:$PATH"
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+
+echo "Start infrastructure: docker compose up -d"
+docker compose -f "$ROOT/docker-compose.yml" up -d
+sleep 25
+
+echo ""
+echo "Run each in a separate terminal (or use tmux):"
+echo ""
+echo "# Workers (8)"
+echo "dotnet run --project $ROOT/src/Services/Reporting/Reporting.Projection.Worker"
+echo "dotnet run --project $ROOT/src/Services/User/User.Projection.Worker"
+echo "dotnet run --project $ROOT/src/Services/Product/Product.Projection.Worker"
+echo "dotnet run --project $ROOT/src/Services/Cart/Cart.Projection.Worker"
+echo "dotnet run --project $ROOT/src/Services/Order/Order.Projection.Worker"
+echo "dotnet run --project $ROOT/src/Services/Order/Order.Integration.Worker"
+echo "dotnet run --project $ROOT/src/Services/Payment/Payment.Projection.Worker"
+echo "dotnet run --project $ROOT/src/Services/Saga/CheckoutSaga.Worker"
+echo ""
+echo "# APIs (13)"
+echo "dotnet run --project $ROOT/src/Services/Reporting/Reporting.Queries.Api"
+echo "dotnet run --project $ROOT/src/Services/User/User.Commands.Api"
+echo "dotnet run --project $ROOT/src/Services/User/User.Queries.Api"
+echo "dotnet run --project $ROOT/src/Gateway/Shop.Gateway.Api"
+echo "dotnet run --project $ROOT/src/Services/Saga/CheckoutSaga.Api"
+echo "dotnet run --project $ROOT/src/Services/Product/Product.Commands.Api"
+echo "dotnet run --project $ROOT/src/Services/Product/Product.Queries.Api"
+echo "dotnet run --project $ROOT/src/Services/Cart/Cart.Commands.Api"
+echo "dotnet run --project $ROOT/src/Services/Cart/Cart.Queries.Api"
+echo "dotnet run --project $ROOT/src/Services/Order/Order.Commands.Api"
+echo "dotnet run --project $ROOT/src/Services/Order/Order.Queries.Api"
+echo "dotnet run --project $ROOT/src/Services/Payment/Payment.Commands.Api"
+echo "dotnet run --project $ROOT/src/Services/Payment/Payment.Queries.Api"

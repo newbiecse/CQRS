@@ -1,0 +1,43 @@
+// Database: CqrsDemo_Cart_Write + CqrsDemo_Cart_Read
+
+Table StoredEvents {
+  Id uniqueidentifier [pk]
+  StreamId uniqueidentifier [not null]
+  StreamType nvarchar(100) [not null, note: 'Cart']
+  Version bigint [not null]
+  EventType nvarchar(200) [not null]
+  Payload nvarchar(max) [not null]
+  OccurredOn datetime2 [not null]
+  indexes { (StreamId, StreamType, Version) [unique] }
+}
+
+Table OutboxMessages {
+  Id uniqueidentifier [pk]
+  EventType nvarchar(200) [not null]
+  Payload nvarchar(max) [not null]
+  OccurredOn datetime2 [not null]
+  ProcessedAt datetime2
+  AttemptCount int
+  LastError nvarchar(2000)
+  indexes { (ProcessedAt, OccurredOn) }
+}
+
+Table Carts {
+  Id uniqueidentifier [pk]
+  CustomerId uniqueidentifier [not null]
+  Status nvarchar(50) [not null]
+  Subtotal decimal(18,2) [not null]
+  CreatedAt datetime2 [not null]
+  LastUpdatedAt datetime2 [not null]
+}
+
+// --- Read DB: CqrsDemo_Cart_Read ---
+Table CartLines {
+  Id uniqueidentifier [pk]
+  CartId uniqueidentifier [not null, ref: > Carts.Id]
+  ProductId uniqueidentifier [not null]
+  ProductName nvarchar(200) [not null]
+  UnitPrice decimal(18,2) [not null]
+  Quantity int [not null]
+  indexes { (CartId, ProductId) [unique] }
+}

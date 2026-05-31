@@ -1,0 +1,33 @@
+// Database: CqrsDemo_Product_Write + CqrsDemo_Product_Read
+// Import at https://dbdiagram.io
+
+Table StoredEvents {
+  Id uniqueidentifier [pk]
+  StreamId uniqueidentifier [not null]
+  StreamType nvarchar(100) [not null, note: 'Product']
+  Version bigint [not null]
+  EventType nvarchar(200) [not null]
+  Payload nvarchar(max) [not null]
+  OccurredOn datetime2 [not null]
+  indexes { (StreamId, StreamType, Version) [unique] }
+}
+
+Table OutboxMessages {
+  Id uniqueidentifier [pk]
+  EventType nvarchar(200) [not null]
+  Payload nvarchar(max) [not null]
+  OccurredOn datetime2 [not null]
+  ProcessedAt datetime2
+  AttemptCount int
+  LastError nvarchar(2000)
+  indexes { (ProcessedAt, OccurredOn) }
+}
+
+// --- Read DB: CqrsDemo_Product_Read ---
+Table Products {
+  Id uniqueidentifier [pk]
+  Name nvarchar(200) [not null]
+  Price decimal(18,2) [not null]
+  CreatedAt datetime2 [not null]
+  LastUpdatedAt datetime2 [not null]
+}

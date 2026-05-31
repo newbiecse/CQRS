@@ -1,0 +1,24 @@
+// Database: CqrsDemo_Reporting (analytics / reporting read model)
+
+Table UserProfiles {
+  UserId uniqueidentifier [pk]
+  Email nvarchar(320) [not null, unique]
+  DisplayName nvarchar(200) [not null]
+  IsActive bit [not null]
+  LastUpdatedAt datetime2 [not null]
+}
+
+Table OrderFacts {
+  OrderId uniqueidentifier [pk]
+  UserId uniqueidentifier [not null]
+  UserEmail nvarchar(320)
+  UserDisplayName nvarchar(200)
+  TotalAmount decimal(18,2) [not null]
+  Status nvarchar(50) [not null]
+  OrderCreatedAt datetime2 [not null]
+  LastUpdatedAt datetime2 [not null]
+  indexes {
+    (UserId, OrderCreatedAt)
+    OrderCreatedAt
+  }
+}

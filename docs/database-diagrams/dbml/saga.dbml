@@ -1,0 +1,18 @@
+// Database: CqrsDemo_Saga
+
+Table CheckoutSagas {
+  Id uniqueidentifier [pk]
+  CartId uniqueidentifier [not null]
+  OrderId uniqueidentifier
+  PaymentId uniqueidentifier
+  SimulatePaymentFailure bit [not null, default: 0]
+  State nvarchar(64) [not null, note: 'Started | CartCheckedOut | OrderCreated | PaymentPending | Completed | PaymentFailed | Compensating | Compensated | Failed']
+  FailureReason nvarchar(2000)
+  CreatedAt datetime2 [not null]
+  UpdatedAt datetime2 [not null]
+
+  indexes {
+    CartId
+    OrderId
+  }
+}

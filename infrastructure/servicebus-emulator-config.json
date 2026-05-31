@@ -1,0 +1,25 @@
+{
+  "UserConfig": {
+    "Namespaces": [
+      {
+        "Name": "sbemulatorns",
+        "Topics": [
+          {
+            "Name": "shop-events",
+            "Subscriptions": [
+              { "Name": "user-projection" },
+              { "Name": "product-projection" },
+              { "Name": "cart-projection" },
+              { "Name": "order-projection" },
+              { "Name": "order-integration" },
+              { "Name": "payment-projection" },
+              { "Name": "checkout-saga-orchestration" },
+              { "Name": "reporting-projection" }
+            ]
+          }
+        ]
+      }
+    ],
+    "Logging": { "Type": "Console" }
+  }
+}

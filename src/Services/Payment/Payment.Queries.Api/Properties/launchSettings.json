@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "Payment.Queries.Api": {
+      "commandName": "Project",
+      "applicationUrl": "http://localhost:5214",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

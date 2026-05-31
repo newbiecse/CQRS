@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "Cart.Queries.Api": {
+      "commandName": "Project",
+      "applicationUrl": "http://localhost:5212",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

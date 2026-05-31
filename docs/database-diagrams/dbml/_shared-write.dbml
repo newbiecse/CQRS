@@ -1,0 +1,30 @@
+// Shared write schema — copy into each service write DB on SQL Server
+// Product_Write | Cart_Write | Order_Write | Payment_Write
+
+Table StoredEvents {
+  Id uniqueidentifier [pk]
+  StreamId uniqueidentifier [not null, note: 'Aggregate id']
+  StreamType nvarchar(100) [not null, note: 'Product | Cart | Order | Payment']
+  Version bigint [not null, note: 'Per-stream sequence 1,2,3...']
+  EventType nvarchar(200) [not null, note: 'e.g. ProductCreatedEvent']
+  Payload nvarchar(max) [not null, note: 'JSON domain event']
+  OccurredOn datetime2 [not null]
+
+  indexes {
+    (StreamId, StreamType, Version) [unique]
+  }
+}
+
+Table OutboxMessages {
+  Id uniqueidentifier [pk]
+  EventType nvarchar(200) [not null, note: 'e.g. product.created.v1']
+  Payload nvarchar(max) [not null, note: 'JSON integration event']
+  OccurredOn datetime2 [not null]
+  ProcessedAt datetime2 [null]
+  AttemptCount int [not null, default: 0]
+  LastError nvarchar(2000) [null]
+
+  indexes {
+    (ProcessedAt, OccurredOn)
+  }
+}

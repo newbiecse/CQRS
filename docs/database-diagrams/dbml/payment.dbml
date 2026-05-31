@@ -1,0 +1,34 @@
+// Database: CqrsDemo_Payment_Write + CqrsDemo_Payment_Read
+
+Table StoredEvents {
+  Id uniqueidentifier [pk]
+  StreamId uniqueidentifier [not null]
+  StreamType nvarchar(100) [not null, note: 'Payment']
+  Version bigint [not null]
+  EventType nvarchar(200) [not null]
+  Payload nvarchar(max) [not null]
+  OccurredOn datetime2 [not null]
+  indexes { (StreamId, StreamType, Version) [unique] }
+}
+
+Table OutboxMessages {
+  Id uniqueidentifier [pk]
+  EventType nvarchar(200) [not null]
+  Payload nvarchar(max) [not null]
+  OccurredOn datetime2 [not null]
+  ProcessedAt datetime2
+  AttemptCount int
+  LastError nvarchar(2000)
+  indexes { (ProcessedAt, OccurredOn) }
+}
+
+Table Payments {
+  Id uniqueidentifier [pk]
+  OrderId uniqueidentifier [not null]
+  Amount decimal(18,2) [not null]
+  Status nvarchar(50) [not null, note: 'Pending | Completed | Failed']
+  FailureReason nvarchar(500)
+  InitiatedAt datetime2 [not null]
+  LastUpdatedAt datetime2 [not null]
+  indexes { OrderId }
+}

@@ -1,0 +1,32 @@
+// Database: CqrsDemo_User_Write + CqrsDemo_User_Read
+
+Table StoredEvents {
+  Id uniqueidentifier [pk]
+  StreamId uniqueidentifier [not null]
+  StreamType nvarchar(100) [not null, note: 'User']
+  Version bigint [not null]
+  EventType nvarchar(200) [not null]
+  Payload nvarchar(max) [not null]
+  OccurredOn datetime2 [not null]
+  indexes { (StreamId, StreamType, Version) [unique] }
+}
+
+Table OutboxMessages {
+  Id uniqueidentifier [pk]
+  EventType nvarchar(200) [not null]
+  Payload nvarchar(max) [not null]
+  OccurredOn datetime2 [not null]
+  ProcessedAt datetime2
+  AttemptCount int
+  LastError nvarchar(2000)
+  indexes { (ProcessedAt, OccurredOn) }
+}
+
+Table Users {
+  Id uniqueidentifier [pk]
+  Email nvarchar(320) [not null, unique]
+  DisplayName nvarchar(200) [not null]
+  IsActive bit [not null]
+  RegisteredAt datetime2 [not null]
+  LastUpdatedAt datetime2 [not null]
+}
