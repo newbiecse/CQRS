@@ -25,6 +25,6 @@ public sealed class LoginWithPasswordCommandHandler(
         if (hash is null || !passwordHasher.Verify(hash, request.Password))
             return null;
 
-        return tokenIssuer.Issue(user);
+        return await tokenIssuer.IssueAsync(user, cancellationToken);
     }
 }

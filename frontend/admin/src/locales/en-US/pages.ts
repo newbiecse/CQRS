@@ -92,4 +92,10 @@ export default {
   'pages.orders.title': 'Orders',
   'pages.orders.create': 'New order',
   'pages.orders.detail': 'Order detail',
+  'pages.users.title': 'Users',
+  'pages.users.create': 'New user',
+  'pages.roles.title': 'Roles',
+  'pages.roles.create': 'New role',
+  'pages.permissions.title': 'Permissions',
+  'pages.permissions.create': 'New permission',
 };

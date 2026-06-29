@@ -64,9 +64,16 @@ public sealed class IdentityUser
 
     public void Deactivate() => IsActive = false;
 
+    public void Activate() => IsActive = true;
+
     public void UpdateDisplayName(string displayName)
     {
         DisplayName = NormalizeName(displayName);
+    }
+
+    public void UpdateRoles(IEnumerable<string>? roles)
+    {
+        RolesCsv = NormalizeRoles(roles);
     }
 
     private static string NormalizeEmail(string email)

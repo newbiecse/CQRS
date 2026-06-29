@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Auth.Api.Endpoints;
 using Auth.Application;
 using Auth.Application.Commands.HandleExternalLogin;
 using Auth.Application.Commands.LoginWithPassword;
@@ -62,6 +63,7 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 app.UsePlatformObservability();
 await app.Services.InitializeIdentityStoreAsync();
+await RbacSeeder.SeedAsync(app.Services);
 await AdminIdentitySeeder.SeedAsync(app.Services);
 
 if (app.Environment.IsDevelopment())
@@ -126,6 +128,8 @@ app.MapGet("/api/auth/facebook", (IOptions<OAuthOptions> options) =>
 
 app.MapGet("/api/auth/facebook/callback", HandleOAuthCallbackAsync(AuthProviders.Facebook));
 
+app.MapAdminIdentityEndpoints();
+
 app.Run();
 
 static Func<HttpContext, IMediator, IOptions<OAuthOptions>, Task<IResult>> HandleOAuthCallbackAsync(string provider) =>
@@ -172,13 +176,15 @@ static object ToLoginResponse(Auth.Application.Services.LoginTokenResult result)
     email = result.Email,
     displayName = result.DisplayName,
     roles = result.Roles,
+    permissions = result.Permissions,
     data = new
     {
         name = result.DisplayName,
         userid = result.UserId.ToString(),
         email = result.Email,
         access = result.CurrentAuthority,
-        roles = result.Roles
+        roles = result.Roles,
+        permissions = result.Permissions
     }
 };
 

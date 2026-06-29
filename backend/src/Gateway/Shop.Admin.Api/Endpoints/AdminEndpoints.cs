@@ -80,13 +80,52 @@ internal static class AdminEndpoints
         group.MapGet("/dashboard", GetDashboardAsync);
 
         group.MapGet("/users", (AdminBackendClient client, IOptions<AdminShopServiceOptions> options, CancellationToken ct) =>
-            client.GetAsync(options.Value.UserQueries, "/api/users", ct));
+            client.GetAsync(options.Value.AuthApi, "/api/auth/admin/users", ct));
+
+        group.MapGet("/users/{userId:guid}", (Guid userId, AdminBackendClient client, IOptions<AdminShopServiceOptions> options, CancellationToken ct) =>
+            client.GetAsync(options.Value.AuthApi, $"/api/auth/admin/users/{userId}", ct));
 
         group.MapPost("/users", (RegisterUserRequest request, AdminBackendClient client, IOptions<AdminShopServiceOptions> options, CancellationToken ct) =>
             client.PostAsync(options.Value.AuthApi, "/api/auth/register", request, ct));
 
+        group.MapPut("/users/{userId:guid}", (Guid userId, UpdateAdminUserRequest request, AdminBackendClient client, IOptions<AdminShopServiceOptions> options, CancellationToken ct) =>
+            client.PutAsync(options.Value.AuthApi, $"/api/auth/admin/users/{userId}", request, ct));
+
         group.MapPost("/users/{userId:guid}/deactivate", (Guid userId, AdminBackendClient client, IOptions<AdminShopServiceOptions> options, CancellationToken ct) =>
-            client.PostAsync(options.Value.UserCommands, $"/api/users/{userId}/deactivate", new { }, ct));
+            client.PostAsync(options.Value.AuthApi, $"/api/auth/admin/users/{userId}/deactivate", new { }, ct));
+
+        group.MapGet("/roles", (AdminBackendClient client, IOptions<AdminShopServiceOptions> options, CancellationToken ct) =>
+            client.GetAsync(options.Value.AuthApi, "/api/auth/admin/roles", ct));
+
+        group.MapGet("/roles/{roleId:guid}", (Guid roleId, AdminBackendClient client, IOptions<AdminShopServiceOptions> options, CancellationToken ct) =>
+            client.GetAsync(options.Value.AuthApi, $"/api/auth/admin/roles/{roleId}", ct));
+
+        group.MapPost("/roles", (CreateRoleAdminRequest request, AdminBackendClient client, IOptions<AdminShopServiceOptions> options, CancellationToken ct) =>
+            client.PostAsync(options.Value.AuthApi, "/api/auth/admin/roles", request, ct));
+
+        group.MapPut("/roles/{roleId:guid}", (Guid roleId, UpdateRoleAdminRequest request, AdminBackendClient client, IOptions<AdminShopServiceOptions> options, CancellationToken ct) =>
+            client.PutAsync(options.Value.AuthApi, $"/api/auth/admin/roles/{roleId}", request, ct));
+
+        group.MapDelete("/roles/{roleId:guid}", (Guid roleId, AdminBackendClient client, IOptions<AdminShopServiceOptions> options, CancellationToken ct) =>
+            client.DeleteAsync(options.Value.AuthApi, $"/api/auth/admin/roles/{roleId}", ct));
+
+        group.MapPut("/roles/{roleId:guid}/permissions", (Guid roleId, SetRolePermissionsRequest request, AdminBackendClient client, IOptions<AdminShopServiceOptions> options, CancellationToken ct) =>
+            client.PutAsync(options.Value.AuthApi, $"/api/auth/admin/roles/{roleId}/permissions", request, ct));
+
+        group.MapGet("/permissions", (AdminBackendClient client, IOptions<AdminShopServiceOptions> options, CancellationToken ct) =>
+            client.GetAsync(options.Value.AuthApi, "/api/auth/admin/permissions", ct));
+
+        group.MapGet("/permissions/{permissionId:guid}", (Guid permissionId, AdminBackendClient client, IOptions<AdminShopServiceOptions> options, CancellationToken ct) =>
+            client.GetAsync(options.Value.AuthApi, $"/api/auth/admin/permissions/{permissionId}", ct));
+
+        group.MapPost("/permissions", (CreatePermissionAdminRequest request, AdminBackendClient client, IOptions<AdminShopServiceOptions> options, CancellationToken ct) =>
+            client.PostAsync(options.Value.AuthApi, "/api/auth/admin/permissions", request, ct));
+
+        group.MapPut("/permissions/{permissionId:guid}", (Guid permissionId, UpdatePermissionAdminRequest request, AdminBackendClient client, IOptions<AdminShopServiceOptions> options, CancellationToken ct) =>
+            client.PutAsync(options.Value.AuthApi, $"/api/auth/admin/permissions/{permissionId}", request, ct));
+
+        group.MapDelete("/permissions/{permissionId:guid}", (Guid permissionId, AdminBackendClient client, IOptions<AdminShopServiceOptions> options, CancellationToken ct) =>
+            client.DeleteAsync(options.Value.AuthApi, $"/api/auth/admin/permissions/{permissionId}", ct));
 
         group.MapGet("/carts/{id:guid}", (Guid id, AdminBackendClient client, IOptions<AdminShopServiceOptions> options, CancellationToken ct) =>
             client.GetAsync(options.Value.CartQueries, $"/api/carts/{id}", ct));
@@ -187,6 +226,12 @@ internal sealed record CreateProductRequest(string Name, decimal Price);
 internal sealed record UpdateProductRequest(string Name, decimal Price);
 internal sealed record UpdatePriceRequest(decimal NewPrice);
 internal sealed record RegisterUserRequest(string Email, string DisplayName, string Password, IReadOnlyList<string>? Roles = null);
+internal sealed record UpdateAdminUserRequest(string DisplayName, IReadOnlyList<string>? Roles, bool IsActive, string? Password = null);
+internal sealed record CreateRoleAdminRequest(string Name, string Description);
+internal sealed record UpdateRoleAdminRequest(string Description);
+internal sealed record SetRolePermissionsRequest(IReadOnlyList<string>? Permissions);
+internal sealed record CreatePermissionAdminRequest(string Name, string Description);
+internal sealed record UpdatePermissionAdminRequest(string Description);
 internal sealed record CancelOrderRequest(string Reason);
 internal sealed record CreateOrderRequest(Guid CustomerId, IReadOnlyList<CreateOrderLineRequest> Lines, Guid? CartId = null, Guid? OrderId = null);
 internal sealed record CreateOrderLineRequest(Guid ProductId, string ProductName, decimal UnitPrice, int Quantity);

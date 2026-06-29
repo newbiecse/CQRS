@@ -56,4 +56,8 @@ export default {
   'menu.orders': 'Orders',
   'menu.orders.order-list': 'Order list',
   'menu.orders.order-detail': 'Order detail',
+  'menu.identity': 'Identity',
+  'menu.identity.users': 'Users',
+  'menu.identity.roles': 'Roles',
+  'menu.identity.permissions': 'Permissions',
 };

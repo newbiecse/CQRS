@@ -87,4 +87,10 @@ export default {
   'pages.orders.title': '订单管理',
   'pages.orders.create': '新建订单',
   'pages.orders.detail': '订单详情',
+  'pages.users.title': '用户管理',
+  'pages.users.create': '新建用户',
+  'pages.roles.title': '角色管理',
+  'pages.roles.create': '新建角色',
+  'pages.permissions.title': '权限管理',
+  'pages.permissions.create': '新建权限',
 };

@@ -39,3 +39,37 @@ GO
 
 CREATE INDEX [IX_ExternalLogins_UserId] ON [ExternalLogins] ([UserId]);
 GO
+
+CREATE TABLE [Roles] (
+    [Id] uniqueidentifier NOT NULL,
+    [Name] nvarchar(64) NOT NULL,
+    [Description] nvarchar(256) NOT NULL,
+    [IsSystem] bit NOT NULL,
+    [CreatedAt] datetime2 NOT NULL,
+    CONSTRAINT [PK_Roles] PRIMARY KEY ([Id])
+);
+GO
+
+CREATE UNIQUE INDEX [IX_Roles_Name] ON [Roles] ([Name]);
+GO
+
+CREATE TABLE [Permissions] (
+    [Id] uniqueidentifier NOT NULL,
+    [Name] nvarchar(128) NOT NULL,
+    [Description] nvarchar(256) NOT NULL,
+    [CreatedAt] datetime2 NOT NULL,
+    CONSTRAINT [PK_Permissions] PRIMARY KEY ([Id])
+);
+GO
+
+CREATE UNIQUE INDEX [IX_Permissions_Name] ON [Permissions] ([Name]);
+GO
+
+CREATE TABLE [RolePermissions] (
+    [RoleId] uniqueidentifier NOT NULL,
+    [PermissionId] uniqueidentifier NOT NULL,
+    CONSTRAINT [PK_RolePermissions] PRIMARY KEY ([RoleId], [PermissionId]),
+    CONSTRAINT [FK_RolePermissions_Roles_RoleId] FOREIGN KEY ([RoleId]) REFERENCES [Roles] ([Id]) ON DELETE CASCADE,
+    CONSTRAINT [FK_RolePermissions_Permissions_PermissionId] FOREIGN KEY ([PermissionId]) REFERENCES [Permissions] ([Id]) ON DELETE CASCADE
+);
+GO

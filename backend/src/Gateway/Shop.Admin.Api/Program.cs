@@ -1,8 +1,10 @@
 using CqrsDemo.BuildingBlocks.Auth;
 using CqrsDemo.BuildingBlocks.Observability;
+using CqrsDemo.BuildingBlocks.Observability.Http;
 using Audit.Infrastructure;
 using Shop.Admin.Api.Clients;
 using Shop.Admin.Api.Endpoints;
+using Shop.Admin.Api.Http;
 using Shop.Admin.Api.Options;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,7 +12,12 @@ builder.AddPlatformObservability("shop-admin-api");
 
 builder.Services.Configure<AdminShopServiceOptions>(
     builder.Configuration.GetSection(AdminShopServiceOptions.SectionName));
-builder.Services.AddCorrelationForwardingHttpClient("admin-backend");
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddTransient<AuthorizationForwardingHandler>();
+builder.Services.AddTransient<CorrelationForwardingHandler>();
+builder.Services.AddHttpClient("admin-backend")
+    .AddHttpMessageHandler<AuthorizationForwardingHandler>()
+    .AddHttpMessageHandler<CorrelationForwardingHandler>();
 builder.Services.AddSingleton<AdminBackendClient>();
 builder.Services.AddAuditElasticsearch(builder.Configuration);
 builder.Services.AddPlatformJwtAuthentication(builder.Configuration);

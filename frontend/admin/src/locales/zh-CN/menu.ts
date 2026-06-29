@@ -56,4 +56,8 @@ export default {
   'menu.orders': '订单',
   'menu.orders.order-list': '订单列表',
   'menu.orders.order-detail': '订单详情',
+  'menu.identity': '身份管理',
+  'menu.identity.users': '用户',
+  'menu.identity.roles': '角色',
+  'menu.identity.permissions': '权限',
 };

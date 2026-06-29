@@ -10,7 +10,8 @@ public sealed record AuthenticatedUser(
     Guid UserId,
     string Email,
     string DisplayName,
-    IReadOnlyList<string> Roles);
+    IReadOnlyList<string> Roles,
+    IReadOnlyList<string>? Permissions = null);
 
 public interface IJwtTokenService
 {
@@ -34,6 +35,12 @@ public sealed class JwtTokenService(IOptions<JwtOptions> options) : IJwtTokenSer
         };
 
         claims.AddRange(user.Roles.Select(role => new Claim(ClaimTypes.Role, role)));
+
+        if (user.Permissions is { Count: > 0 })
+        {
+            claims.AddRange(user.Permissions.Select(permission =>
+                new Claim(PlatformClaimTypes.Permission, permission)));
+        }
 
         var token = new JwtSecurityToken(
             issuer: jwt.Issuer,

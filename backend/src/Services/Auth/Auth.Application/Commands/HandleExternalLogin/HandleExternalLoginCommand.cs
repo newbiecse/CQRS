@@ -27,7 +27,7 @@ public sealed class HandleExternalLoginCommandHandler(
         {
             if (!existing.IsActive)
                 throw new InvalidOperationException("Account is deactivated.");
-            return tokenIssuer.Issue(existing);
+            return await tokenIssuer.IssueAsync(existing, cancellationToken);
         }
 
         var userByEmail = await repository.GetByEmailAsync(request.Email, cancellationToken);
@@ -48,6 +48,6 @@ public sealed class HandleExternalLoginCommandHandler(
             new ExternalLoginRecord(user.Id, provider, providerUserId, request.Email, DateTime.UtcNow),
             cancellationToken);
 
-        return tokenIssuer.Issue(user);
+        return await tokenIssuer.IssueAsync(user, cancellationToken);
     }
 }

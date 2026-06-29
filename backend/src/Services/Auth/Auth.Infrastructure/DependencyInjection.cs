@@ -1,4 +1,5 @@
 using Auth.Application.Abstractions;
+using Auth.Application.Admin;
 using Auth.Application.Commands.RegisterLocalUser;
 using Auth.Infrastructure.Http;
 using Auth.Infrastructure.Persistence;
@@ -20,6 +21,8 @@ public static class DependencyInjection
 
         services.AddDbContext<IdentityDbContext>(o => o.UseSqlServer(connection));
         services.AddScoped<IIdentityRepository, SqlIdentityRepository>();
+        services.AddScoped<IAuthorizationStore, SqlAuthorizationStore>();
+        services.AddScoped<IAuthorizationAdminService, AuthorizationAdminService>();
         services.AddSingleton<IPasswordHasher, BcryptPasswordHasher>();
         services.AddUserProfileProvisioner(configuration);
         return services;

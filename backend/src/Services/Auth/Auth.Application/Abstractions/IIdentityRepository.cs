@@ -18,6 +18,7 @@ public interface IIdentityRepository
     Task SaveExternalLoginAsync(ExternalLoginRecord login, CancellationToken cancellationToken = default);
     Task<ExternalLoginRecord?> GetExternalLoginAsync(string provider, string providerUserId, CancellationToken cancellationToken = default);
     Task<IdentityUser?> GetByExternalLoginAsync(string provider, string providerUserId, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<IdentityUser>> ListAllAsync(CancellationToken cancellationToken = default);
 }
 
 public sealed record ExternalLoginRecord(
@@ -30,4 +31,6 @@ public sealed record ExternalLoginRecord(
 public interface IUserProfileProvisioner
 {
     Task ProvisionAsync(Guid userId, string email, string displayName, CancellationToken cancellationToken = default);
+    Task UpdateDisplayNameAsync(Guid userId, string displayName, CancellationToken cancellationToken = default);
+    Task DeactivateAsync(Guid userId, CancellationToken cancellationToken = default);
 }

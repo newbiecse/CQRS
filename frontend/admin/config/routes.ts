@@ -61,6 +61,33 @@ export default [
     ],
   },
   {
+    path: '/identity',
+    name: 'identity',
+    icon: 'team',
+    access: 'canAdmin',
+    routes: [
+      { path: '/identity', redirect: '/identity/users' },
+      {
+        path: '/identity/users',
+        name: 'users',
+        component: './identity/users',
+        access: 'canAdmin',
+      },
+      {
+        path: '/identity/roles',
+        name: 'roles',
+        component: './identity/roles',
+        access: 'canAdmin',
+      },
+      {
+        path: '/identity/permissions',
+        name: 'permissions',
+        component: './identity/permissions',
+        access: 'canAdmin',
+      },
+    ],
+  },
+  {
     path: '/',
     redirect: '/catalog/products',
   },

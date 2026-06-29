@@ -111,6 +111,12 @@ public sealed class SqlIdentityRepository(IdentityDbContext db) : IIdentityRepos
         return user is null ? null : ToDomain(user);
     }
 
+    public async Task<IReadOnlyList<IdentityUser>> ListAllAsync(CancellationToken cancellationToken = default)
+    {
+        var entities = await db.Users.AsNoTracking().OrderBy(u => u.Email).ToListAsync(cancellationToken);
+        return entities.Select(ToDomain).ToList();
+    }
+
     private static IdentityUser ToDomain(IdentityUserEntity entity) =>
         IdentityUser.Restore(entity.Id, entity.Email, entity.DisplayName, entity.RolesCsv, entity.IsActive, entity.CreatedAt);
 
