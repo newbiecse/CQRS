@@ -1,11 +1,10 @@
 using Cart.Application.Abstractions;
-using Cart.Infrastructure.EventStore;
+using Cart.Infrastructure.Integration;
 using Cart.Infrastructure.Persistence.Read;
+using Cart.Infrastructure.Persistence.Write;
 using Cart.Infrastructure.Projections;
-using CqrsDemo.BuildingBlocks.EventStore;
-using CqrsDemo.BuildingBlocks.EventStore.Abstractions;
 using CqrsDemo.BuildingBlocks.Messaging;
-using CqrsDemo.BuildingBlocks.EventStore.Persistence;
+using CqrsDemo.BuildingBlocks.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,10 +15,9 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddCartWriteInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddEventStoreInfrastructure(configuration, "WriteDb");
-        services.AddScoped<IDomainEventSerializer, CartDomainEventSerializer>();
+        services.AddWriteDbContext<CartWriteDbContext>(configuration);
         services.AddScoped<IIntegrationEventMapper, CartIntegrationEventMapper>();
-        services.AddServiceBusOutbox(configuration);
+        services.AddScoped<ICartWriteRepository, SqlCartWriteRepository>();
         return services;
     }
 
@@ -33,11 +31,8 @@ public static class DependencyInjection
         return services;
     }
 
-    public static async Task InitializeCartWriteStoreAsync(this IServiceProvider serviceProvider)
-    {
-        using var scope = serviceProvider.CreateScope();
-        await scope.ServiceProvider.GetRequiredService<EventStoreDbContext>().Database.EnsureCreatedAsync();
-    }
+    public static Task InitializeCartWriteStoreAsync(this IServiceProvider serviceProvider) =>
+        serviceProvider.InitializeWriteStoreAsync<CartWriteDbContext>();
 
     public static async Task InitializeCartReadStoreAsync(this IServiceProvider serviceProvider)
     {

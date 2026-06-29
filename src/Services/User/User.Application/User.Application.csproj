@@ -11,6 +11,5 @@
   <ItemGroup>
     <ProjectReference Include="..\User.Domain\User.Domain.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\CqrsDemo.BuildingBlocks.Domain\CqrsDemo.BuildingBlocks.Domain.csproj" />
-    <ProjectReference Include="..\..\..\BuildingBlocks\CqrsDemo.BuildingBlocks.EventStore\CqrsDemo.BuildingBlocks.EventStore.csproj" />
   </ItemGroup>
 </Project>

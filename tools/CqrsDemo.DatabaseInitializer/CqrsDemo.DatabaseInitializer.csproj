@@ -10,8 +10,6 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.11" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\BuildingBlocks\CqrsDemo.BuildingBlocks.EventStore\CqrsDemo.BuildingBlocks.EventStore.csproj" />
-    <ProjectReference Include="..\..\src\CqrsDemo.Commands.Infrastructure\CqrsDemo.Commands.Infrastructure.csproj" />
     <ProjectReference Include="..\..\src\CqrsDemo.Queries.Infrastructure\CqrsDemo.Queries.Infrastructure.csproj" />
     <ProjectReference Include="..\..\src\Services\Cart\Cart.Infrastructure\Cart.Infrastructure.csproj" />
     <ProjectReference Include="..\..\src\Services\Order\Order.Infrastructure\Order.Infrastructure.csproj" />

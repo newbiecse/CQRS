@@ -4,13 +4,13 @@ using MediatR;
 
 namespace CqrsDemo.Commands.Application.Products.Commands.CreateProduct;
 
-public sealed class CreateProductCommandHandler(IProductWriteUnitOfWork unitOfWork)
+public sealed class CreateProductCommandHandler(IProductWriteRepository repository)
     : IRequestHandler<CreateProductCommand, Guid>
 {
     public async Task<Guid> Handle(CreateProductCommand request, CancellationToken cancellationToken)
     {
         var product = Product.Create(request.Name, request.Price);
-        await unitOfWork.SaveNewAsync(product, cancellationToken);
+        await repository.AddAsync(product, cancellationToken);
         return product.Id;
     }
 }

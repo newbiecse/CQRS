@@ -5,8 +5,6 @@ namespace Payment.Domain;
 
 public sealed class PaymentAggregate : AggregateRoot
 {
-    public const string StreamType = "Payment";
-
     public Guid OrderId { get; private set; }
     public decimal Amount { get; private set; }
     public PaymentStatus Status { get; private set; }
@@ -18,65 +16,52 @@ public sealed class PaymentAggregate : AggregateRoot
     public static PaymentAggregate Initiate(Guid orderId, decimal amount)
     {
         if (amount <= 0) throw new ArgumentException("Amount must be greater than zero.", nameof(amount));
-        var payment = new PaymentAggregate();
-        payment.Raise(new PaymentInitiatedEvent(Guid.NewGuid(), orderId, amount, DateTime.UtcNow));
+
+        var payment = new PaymentAggregate
+        {
+            Id = Guid.NewGuid(),
+            OrderId = orderId,
+            Amount = amount,
+            Status = PaymentStatus.Pending,
+            InitiatedAt = DateTime.UtcNow
+        };
+        payment.RaiseDomainEvent(new PaymentInitiatedEvent(payment.Id, orderId, amount, payment.InitiatedAt));
         return payment;
     }
 
-    public static PaymentAggregate Load(IReadOnlyList<IDomainEvent> history)
-    {
-        var payment = new PaymentAggregate();
-        foreach (var e in history) payment.Apply(e);
-        payment.SetVersion(history.Count);
-        payment.ClearDomainEvents();
-        return payment;
-    }
+    public static PaymentAggregate Restore(
+        Guid id,
+        Guid orderId,
+        decimal amount,
+        PaymentStatus status,
+        DateTime initiatedAt,
+        string? failureReason) =>
+        new()
+        {
+            Id = id,
+            OrderId = orderId,
+            Amount = amount,
+            Status = status,
+            InitiatedAt = initiatedAt,
+            FailureReason = failureReason
+        };
 
     public void Complete()
     {
         if (Status != PaymentStatus.Pending) throw new InvalidOperationException("Only pending payments can be completed.");
-        Raise(new PaymentCompletedEvent(Id, OrderId, Amount, DateTime.UtcNow));
+
+        Status = PaymentStatus.Completed;
+        FailureReason = null;
+        RaiseDomainEvent(new PaymentCompletedEvent(Id, OrderId, Amount, DateTime.UtcNow));
     }
 
     public void Fail(string reason)
     {
         if (Status != PaymentStatus.Pending) throw new InvalidOperationException("Only pending payments can fail.");
         if (string.IsNullOrWhiteSpace(reason)) throw new ArgumentException("Failure reason is required.", nameof(reason));
-        Raise(new PaymentFailedEvent(Id, OrderId, reason, DateTime.UtcNow));
-    }
 
-    private void Raise(IDomainEvent e)
-    {
-        Apply(e);
-        RaiseDomainEvent(e);
-    }
-
-    private void Apply(IDomainEvent e)
-    {
-        switch (e)
-        {
-            case PaymentInitiatedEvent initiated:
-                ApplyInitiated(initiated);
-                break;
-            case PaymentCompletedEvent:
-                Status = PaymentStatus.Completed;
-                FailureReason = null;
-                break;
-            case PaymentFailedEvent failed:
-                Status = PaymentStatus.Failed;
-                FailureReason = failed.Reason;
-                break;
-            default:
-                throw new NotSupportedException(e.GetType().Name);
-        }
-    }
-
-    private void ApplyInitiated(PaymentInitiatedEvent initiated)
-    {
-        Id = initiated.PaymentId;
-        OrderId = initiated.OrderId;
-        Amount = initiated.Amount;
-        InitiatedAt = initiated.InitiatedAt;
-        Status = PaymentStatus.Pending;
+        Status = PaymentStatus.Failed;
+        FailureReason = reason;
+        RaiseDomainEvent(new PaymentFailedEvent(Id, OrderId, reason, DateTime.UtcNow));
     }
 }

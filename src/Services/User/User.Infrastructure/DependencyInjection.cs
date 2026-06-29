@@ -1,12 +1,12 @@
-using CqrsDemo.BuildingBlocks.EventStore;
-using CqrsDemo.BuildingBlocks.EventStore.Abstractions;
 using CqrsDemo.BuildingBlocks.Messaging;
+using CqrsDemo.BuildingBlocks.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using User.Application.Abstractions;
-using User.Infrastructure.EventStore;
+using User.Infrastructure.Integration;
 using User.Infrastructure.Persistence.Read;
+using User.Infrastructure.Persistence.Write;
 using User.Infrastructure.Projections;
 
 namespace User.Infrastructure;
@@ -15,10 +15,9 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddUserWriteInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddEventStoreInfrastructure(configuration, "WriteDb");
-        services.AddScoped<IDomainEventSerializer, UserDomainEventSerializer>();
+        services.AddWriteDbContext<UserWriteDbContext>(configuration);
         services.AddScoped<IIntegrationEventMapper, UserIntegrationEventMapper>();
-        services.AddServiceBusOutbox(configuration);
+        services.AddScoped<IUserWriteRepository, SqlUserWriteRepository>();
         return services;
     }
 
@@ -33,7 +32,7 @@ public static class DependencyInjection
     }
 
     public static Task InitializeUserWriteStoreAsync(this IServiceProvider sp) =>
-        sp.InitializeEventStoreAsync();
+        sp.InitializeWriteStoreAsync<UserWriteDbContext>();
 
     public static async Task InitializeUserReadStoreAsync(this IServiceProvider sp)
     {

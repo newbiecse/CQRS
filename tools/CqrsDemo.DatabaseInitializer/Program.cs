@@ -1,14 +1,17 @@
 using Cart.Infrastructure.Persistence.Read;
+using Cart.Infrastructure.Persistence.Write;
 using CheckoutSaga.Infrastructure.Persistence;
-using CqrsDemo.BuildingBlocks.EventStore.Persistence;
-using CqrsDemo.Commands.Infrastructure.Persistence.Write;
 using CqrsDemo.Queries.Infrastructure.Persistence.Read;
 using Microsoft.EntityFrameworkCore;
 using Order.Infrastructure.Persistence.Read;
+using Order.Infrastructure.Persistence.Write;
 using Payment.Infrastructure.Persistence.Read;
+using Payment.Infrastructure.Persistence.Write;
 using Product.Infrastructure.Persistence.Read;
+using Product.Infrastructure.Persistence.Write;
 using Reporting.Infrastructure.Persistence;
 using User.Infrastructure.Persistence.Read;
+using User.Infrastructure.Persistence.Write;
 
 const string connectionTemplate =
     "Server=localhost;database={0};Trusted_Connection=False;persist security info=True;Integrated Security=SSPI;TrustServerCertificate=True;";
@@ -19,11 +22,11 @@ var sqlOutputDir = Path.Combine(repoRoot, "scripts", "sql");
 
 var targets = new (string Database, Func<string, DbContext> CreateContext)[]
 {
-    ("CqrsDemo_Product_Write", conn => Create<EventStoreDbContext>(conn)),
-    ("CqrsDemo_Cart_Write", conn => Create<EventStoreDbContext>(conn)),
-    ("CqrsDemo_Order_Write", conn => Create<EventStoreDbContext>(conn)),
-    ("CqrsDemo_Payment_Write", conn => Create<EventStoreDbContext>(conn)),
-    ("CqrsDemo_User_Write", conn => Create<EventStoreDbContext>(conn)),
+    ("CqrsDemo_Product_Write", conn => Create<ProductWriteDbContext>(conn)),
+    ("CqrsDemo_Cart_Write", conn => Create<CartWriteDbContext>(conn)),
+    ("CqrsDemo_Order_Write", conn => Create<OrderWriteDbContext>(conn)),
+    ("CqrsDemo_Payment_Write", conn => Create<PaymentWriteDbContext>(conn)),
+    ("CqrsDemo_User_Write", conn => Create<UserWriteDbContext>(conn)),
 
     ("CqrsDemo_Product_Read", conn => Create<ProductReadDbContext>(conn)),
     ("CqrsDemo_Cart_Read", conn => Create<CartReadDbContext>(conn)),
@@ -34,7 +37,6 @@ var targets = new (string Database, Func<string, DbContext> CreateContext)[]
     ("CqrsDemo_Saga", conn => Create<CheckoutSagaDbContext>(conn)),
     ("CqrsDemo_Reporting", conn => Create<ReportingDbContext>(conn)),
 
-    ("CqrsDemo_Write", conn => Create<WriteDbContext>(conn)),
     ("CqrsDemo_Read", conn => Create<ReadDbContext>(conn)),
 };
 

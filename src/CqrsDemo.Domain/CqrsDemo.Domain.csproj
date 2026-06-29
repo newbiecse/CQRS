@@ -7,11 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MediatR.Contracts" Version="2.0.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <InternalsVisibleTo Include="CqrsDemo.Commands.Infrastructure" />
+    <ProjectReference Include="..\BuildingBlocks\CqrsDemo.BuildingBlocks.Domain\CqrsDemo.BuildingBlocks.Domain.csproj" />
   </ItemGroup>
 
 </Project>

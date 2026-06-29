@@ -7,12 +7,13 @@
   <ItemGroup>
     <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.18.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.11" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.2" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CqrsDemo.BuildingBlocks.EventStore\CqrsDemo.BuildingBlocks.EventStore.csproj" />
+    <ProjectReference Include="..\CqrsDemo.BuildingBlocks.Domain\CqrsDemo.BuildingBlocks.Domain.csproj" />
     <ProjectReference Include="..\..\CqrsDemo.Contracts\CqrsDemo.Contracts.csproj" />
   </ItemGroup>
 </Project>

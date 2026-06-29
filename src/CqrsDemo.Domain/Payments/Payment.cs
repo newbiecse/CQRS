@@ -1,12 +1,10 @@
-using CqrsDemo.Domain.Common;
+using CqrsDemo.BuildingBlocks.Domain;
 using CqrsDemo.Domain.Payments.Events;
 
 namespace CqrsDemo.Domain.Payments;
 
-public class Payment : AggregateRoot
+public sealed class Payment : AggregateRoot
 {
-    public const string StreamType = "Payment";
-
     public Guid OrderId { get; private set; }
     public decimal Amount { get; private set; }
     public PaymentStatus Status { get; private set; }
@@ -24,23 +22,34 @@ public class Payment : AggregateRoot
             throw new ArgumentException("Amount must be greater than zero.", nameof(amount));
         }
 
-        var payment = new Payment();
-        payment.ApplyNew(new PaymentInitiatedEvent(Guid.NewGuid(), orderId, amount, DateTime.UtcNow));
-        return payment;
-    }
-
-    public static Payment LoadFromHistory(IReadOnlyList<IDomainEvent> history)
-    {
-        var payment = new Payment();
-        foreach (var domainEvent in history)
+        var payment = new Payment
         {
-            payment.Apply(domainEvent);
-        }
-
-        payment.SetVersion(history.Count);
-        payment.ClearDomainEvents();
+            Id = Guid.NewGuid(),
+            OrderId = orderId,
+            Amount = amount,
+            Status = PaymentStatus.Pending,
+            InitiatedAt = DateTime.UtcNow
+        };
+        payment.RaiseDomainEvent(new PaymentInitiatedEvent(payment.Id, orderId, amount, payment.InitiatedAt));
         return payment;
     }
+
+    public static Payment Restore(
+        Guid id,
+        Guid orderId,
+        decimal amount,
+        PaymentStatus status,
+        DateTime initiatedAt,
+        string? failureReason) =>
+        new()
+        {
+            Id = id,
+            OrderId = orderId,
+            Amount = amount,
+            Status = status,
+            InitiatedAt = initiatedAt,
+            FailureReason = failureReason
+        };
 
     public void Complete()
     {
@@ -49,7 +58,9 @@ public class Payment : AggregateRoot
             throw new InvalidOperationException("Only pending payments can be completed.");
         }
 
-        ApplyNew(new PaymentCompletedEvent(Id, OrderId, Amount, DateTime.UtcNow));
+        Status = PaymentStatus.Completed;
+        FailureReason = null;
+        RaiseDomainEvent(new PaymentCompletedEvent(Id, OrderId, Amount, DateTime.UtcNow));
     }
 
     public void Fail(string reason)
@@ -59,40 +70,8 @@ public class Payment : AggregateRoot
             throw new InvalidOperationException("Only pending payments can fail.");
         }
 
-        ApplyNew(new PaymentFailedEvent(Id, OrderId, reason, DateTime.UtcNow));
-    }
-
-    private void ApplyNew(IDomainEvent domainEvent)
-    {
-        Apply(domainEvent);
-        RaiseDomainEvent(domainEvent);
-    }
-
-    internal void Apply(IDomainEvent domainEvent)
-    {
-        switch (domainEvent)
-        {
-            case PaymentInitiatedEvent initiated:
-                Id = initiated.PaymentId;
-                OrderId = initiated.OrderId;
-                Amount = initiated.Amount;
-                InitiatedAt = initiated.InitiatedAt;
-                Status = PaymentStatus.Pending;
-                break;
-
-            case PaymentCompletedEvent:
-                Status = PaymentStatus.Completed;
-                FailureReason = null;
-                break;
-
-            case PaymentFailedEvent failed:
-                Status = PaymentStatus.Failed;
-                FailureReason = failed.Reason;
-                break;
-
-            default:
-                throw new NotSupportedException(
-                    $"Domain event {domainEvent.GetType().Name} is not supported by {nameof(Payment)}.");
-        }
+        Status = PaymentStatus.Failed;
+        FailureReason = reason;
+        RaiseDomainEvent(new PaymentFailedEvent(Id, OrderId, reason, DateTime.UtcNow));
     }
 }

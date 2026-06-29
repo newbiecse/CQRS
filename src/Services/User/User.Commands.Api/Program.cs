@@ -1,4 +1,3 @@
-using CqrsDemo.BuildingBlocks.Domain;
 using MediatR;
 using User.Application;
 using User.Application.Commands.DeactivateUser;
@@ -56,10 +55,6 @@ static async Task<IResult> ExecuteAsync(Func<Task> action)
     catch (KeyNotFoundException ex) { return Results.NotFound(new { message = ex.Message }); }
     catch (InvalidOperationException ex) { return Results.BadRequest(new { message = ex.Message }); }
     catch (ArgumentException ex) { return Results.BadRequest(new { message = ex.Message }); }
-    catch (ConcurrencyException ex)
-    {
-        return Results.Conflict(new { message = ex.Message, ex.StreamId, ex.ExpectedVersion, ex.ActualVersion });
-    }
 }
 
 internal sealed record RegisterUserRequest(string Email, string DisplayName);

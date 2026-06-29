@@ -1,22 +1,17 @@
-using CqrsDemo.BuildingBlocks.Domain;
 using CqrsDemo.Contracts.Carts;
 using CqrsDemo.Contracts.Serialization;
-using CqrsDemo.BuildingBlocks.EventStore.Abstractions;
+using CqrsDemo.BuildingBlocks.Domain;
+using Order.Application.Abstractions;
 using Order.Domain;
 
 namespace Order.Application.Integration;
 
-public sealed class OrderIntegrationHandlers(IEventStore eventStore)
+public sealed class OrderIntegrationHandlers(IOrderWriteRepository repository)
 {
     public async Task HandleCartCheckedOutAsync(string payload, CancellationToken cancellationToken)
     {
         var e = IntegrationEventSerializer.Deserialize<CartCheckedOutIntegrationEvent>(payload);
-        var existing = await eventStore.LoadAsync(
-            e.OrderId,
-            OrderAggregate.StreamType,
-            OrderAggregate.Load,
-            cancellationToken);
-        if (existing is not null) return;
+        if (await repository.ExistsAsync(e.OrderId, cancellationToken)) return;
 
         var lines = e.Lines.Select(l => new OrderLine
         {
@@ -27,6 +22,6 @@ public sealed class OrderIntegrationHandlers(IEventStore eventStore)
         }).ToList();
 
         var order = OrderAggregate.Create(e.OrderId, e.CustomerId, e.CartId, lines);
-        await eventStore.SaveNewAsync(order, OrderAggregate.StreamType, cancellationToken);
+        await repository.AddAsync(order, cancellationToken);
     }
 }

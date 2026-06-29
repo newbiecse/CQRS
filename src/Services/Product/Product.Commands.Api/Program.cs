@@ -1,4 +1,3 @@
-using CqrsDemo.BuildingBlocks.Domain;
 using MediatR;
 using Product.Application;
 using Product.Application.Commands.CreateProduct;
@@ -31,7 +30,6 @@ app.MapPut("/api/products/{id:guid}/price", async (Guid id, UpdatePriceRequest r
         return Results.Accepted($"/api/products/{id}", new { id });
     }
     catch (KeyNotFoundException ex) { return Results.NotFound(new { message = ex.Message }); }
-    catch (ConcurrencyException ex) { return Results.Conflict(new { ex.StreamId, ex.ExpectedVersion, ex.ActualVersion }); }
 });
 
 app.Run();

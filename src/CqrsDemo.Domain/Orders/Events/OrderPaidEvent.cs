@@ -1,4 +1,4 @@
-using CqrsDemo.Domain.Common;
+using CqrsDemo.BuildingBlocks.Domain;
 
 namespace CqrsDemo.Domain.Orders.Events;
 

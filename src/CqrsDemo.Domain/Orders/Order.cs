@@ -1,12 +1,10 @@
-using CqrsDemo.Domain.Common;
+using CqrsDemo.BuildingBlocks.Domain;
 using CqrsDemo.Domain.Orders.Events;
 
 namespace CqrsDemo.Domain.Orders;
 
-public class Order : AggregateRoot
+public sealed class Order : AggregateRoot
 {
-    public const string StreamType = "Order";
-
     public Guid CustomerId { get; private set; }
     public Guid CartId { get; private set; }
     public OrderStatus Status { get; private set; }
@@ -26,29 +24,40 @@ public class Order : AggregateRoot
             throw new ArgumentException("Order must contain at least one line.", nameof(lines));
         }
 
-        var order = new Order();
         var total = lines.Sum(l => l.LineTotal);
-        order.ApplyNew(new OrderCreatedEvent(
-            Guid.NewGuid(),
-            customerId,
-            cartId,
-            lines.ToList(),
-            total,
-            DateTime.UtcNow));
-
+        var order = new Order
+        {
+            Id = Guid.NewGuid(),
+            CustomerId = customerId,
+            CartId = cartId,
+            Status = OrderStatus.PendingPayment,
+            TotalAmount = total,
+            CreatedAt = DateTime.UtcNow
+        };
+        order._lines.AddRange(lines);
+        order.RaiseDomainEvent(new OrderCreatedEvent(order.Id, customerId, cartId, lines.ToList(), total, order.CreatedAt));
         return order;
     }
 
-    public static Order LoadFromHistory(IReadOnlyList<IDomainEvent> history)
+    public static Order Restore(
+        Guid id,
+        Guid customerId,
+        Guid cartId,
+        OrderStatus status,
+        decimal totalAmount,
+        DateTime createdAt,
+        IReadOnlyList<OrderLine> lines)
     {
-        var order = new Order();
-        foreach (var domainEvent in history)
+        var order = new Order
         {
-            order.Apply(domainEvent);
-        }
-
-        order.SetVersion(history.Count);
-        order.ClearDomainEvents();
+            Id = id,
+            CustomerId = customerId,
+            CartId = cartId,
+            Status = status,
+            TotalAmount = totalAmount,
+            CreatedAt = createdAt
+        };
+        order._lines.AddRange(lines);
         return order;
     }
 
@@ -66,37 +75,7 @@ public class Order : AggregateRoot
                 nameof(amount));
         }
 
-        ApplyNew(new OrderPaidEvent(Id, paymentId, amount, DateTime.UtcNow));
-    }
-
-    private void ApplyNew(IDomainEvent domainEvent)
-    {
-        Apply(domainEvent);
-        RaiseDomainEvent(domainEvent);
-    }
-
-    internal void Apply(IDomainEvent domainEvent)
-    {
-        switch (domainEvent)
-        {
-            case OrderCreatedEvent created:
-                Id = created.OrderId;
-                CustomerId = created.CustomerId;
-                CartId = created.CartId;
-                _lines.Clear();
-                _lines.AddRange(created.Lines);
-                TotalAmount = created.TotalAmount;
-                CreatedAt = created.CreatedAt;
-                Status = OrderStatus.PendingPayment;
-                break;
-
-            case OrderPaidEvent:
-                Status = OrderStatus.Paid;
-                break;
-
-            default:
-                throw new NotSupportedException(
-                    $"Domain event {domainEvent.GetType().Name} is not supported by {nameof(Order)}.");
-        }
+        Status = OrderStatus.Paid;
+        RaiseDomainEvent(new OrderPaidEvent(Id, paymentId, amount, DateTime.UtcNow));
     }
 }

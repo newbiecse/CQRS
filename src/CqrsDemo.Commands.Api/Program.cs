@@ -6,9 +6,7 @@ using CqrsDemo.Commands.Application.Orders.Commands.CheckoutCart;
 using CqrsDemo.Commands.Application.Payments.Commands.PayOrder;
 using CqrsDemo.Commands.Application.Products.Commands.CreateProduct;
 using CqrsDemo.Commands.Application.Products.Commands.UpdateProductPrice;
-using CqrsDemo.Commands.Application.Products.Queries.GetProductEventHistory;
 using CqrsDemo.Commands.Infrastructure;
-using CqrsDemo.Domain.Common;
 using MediatR;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -31,11 +29,11 @@ if (app.Environment.IsDevelopment())
 app.MapGet("/", () => Results.Ok(new
 {
     service = "CqrsDemo.Commands.Api",
-    description = "Shopping cart write API (Event Sourcing + outbox + Azure Service Bus)",
+    description = "Shopping cart write API (CQRS + outbox + Azure Service Bus)",
     flow = new[] { "Create cart → Add items → Checkout → Pay order" },
     endpoints = new
     {
-        products = new[] { "POST /api/products", "PUT /api/products/{id}/price", "GET /api/products/{id}/events" },
+        products = new[] { "POST /api/products", "PUT /api/products/{id}/price" },
         carts = new[] { "POST /api/carts", "POST /api/carts/{id}/items", "DELETE /api/carts/{id}/items/{productId}", "POST /api/carts/{id}/checkout" },
         payments = new[] { "POST /api/orders/{orderId}/pay" }
     }
@@ -51,12 +49,6 @@ app.MapPut("/api/products/{id:guid}/price", async (Guid id, UpdateProductPriceRe
 {
     return await ExecuteAsync(() => mediator.Send(new UpdateProductPriceCommand(id, request.NewPrice)),
         () => Results.Accepted($"/api/products/{id}", new { id, message = "Price update accepted." }));
-});
-
-app.MapGet("/api/products/{id:guid}/events", async (Guid id, IMediator mediator) =>
-{
-    var events = await mediator.Send(new GetProductEventHistoryQuery(id));
-    return events is null ? Results.NotFound() : Results.Ok(events);
 });
 
 app.MapPost("/api/carts", async (CreateCartRequest request, IMediator mediator) =>
@@ -123,16 +115,6 @@ static async Task<IResult> ExecuteAsync(Func<Task> action, Func<IResult> onSucce
     {
         return Results.BadRequest(new { message = ex.Message });
     }
-    catch (ConcurrencyException ex)
-    {
-        return Results.Conflict(new
-        {
-            message = ex.Message,
-            ex.StreamId,
-            ex.ExpectedVersion,
-            ex.ActualVersion
-        });
-    }
 }
 
 static async Task<IResult> ExecuteWithResultAsync<T>(Func<Task<T>> action, Func<T, IResult> onSuccess)
@@ -153,16 +135,6 @@ static async Task<IResult> ExecuteWithResultAsync<T>(Func<Task<T>> action, Func<
     catch (ArgumentException ex)
     {
         return Results.BadRequest(new { message = ex.Message });
-    }
-    catch (ConcurrencyException ex)
-    {
-        return Results.Conflict(new
-        {
-            message = ex.Message,
-            ex.StreamId,
-            ex.ExpectedVersion,
-            ex.ActualVersion
-        });
     }
 }
 

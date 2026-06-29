@@ -1,5 +1,5 @@
-using CqrsDemo.BuildingBlocks.EventStore.Persistence;
 using CqrsDemo.BuildingBlocks.Messaging.Abstractions;
+using CqrsDemo.BuildingBlocks.Messaging.Persistence;
 using CqrsDemo.Contracts.Messaging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -33,7 +33,7 @@ public sealed class OutboxPublisherBackgroundService(
     private async Task<int> PublishBatchAsync(CancellationToken ct)
     {
         using var scope = scopeFactory.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<EventStoreDbContext>();
+        var db = scope.ServiceProvider.GetRequiredService<IOutboxDbContext>();
         var publisher = scope.ServiceProvider.GetRequiredService<IIntegrationEventPublisher>();
         var batch = await db.OutboxMessages.Where(m => m.ProcessedAt == null).OrderBy(m => m.OccurredOn).Take(20).ToListAsync(ct);
         if (batch.Count == 0) return 0;

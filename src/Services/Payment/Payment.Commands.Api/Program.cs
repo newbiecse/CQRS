@@ -1,4 +1,3 @@
-using CqrsDemo.BuildingBlocks.Domain;
 using MediatR;
 using Payment.Application;
 using Payment.Application.Commands.PayOrder;
@@ -31,10 +30,6 @@ app.MapPost("/api/orders/{orderId:guid}/pay", async (Guid orderId, bool simulate
     catch (KeyNotFoundException ex) { return Results.NotFound(new { message = ex.Message }); }
     catch (InvalidOperationException ex) { return Results.BadRequest(new { message = ex.Message }); }
     catch (ArgumentException ex) { return Results.BadRequest(new { message = ex.Message }); }
-    catch (ConcurrencyException ex)
-    {
-        return Results.Conflict(new { message = ex.Message, ex.StreamId, ex.ExpectedVersion, ex.ActualVersion });
-    }
 });
 
 app.Run();

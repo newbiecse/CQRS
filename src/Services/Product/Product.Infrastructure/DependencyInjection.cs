@@ -1,13 +1,12 @@
-using CqrsDemo.BuildingBlocks.EventStore;
-using CqrsDemo.BuildingBlocks.EventStore.Abstractions;
-using CqrsDemo.BuildingBlocks.EventStore.Persistence;
 using CqrsDemo.BuildingBlocks.Messaging;
+using CqrsDemo.BuildingBlocks.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Product.Application.Abstractions;
-using Product.Infrastructure.EventStore;
+using Product.Infrastructure.Integration;
 using Product.Infrastructure.Persistence.Read;
+using Product.Infrastructure.Persistence.Write;
 using Product.Infrastructure.Projections;
 
 namespace Product.Infrastructure;
@@ -16,10 +15,9 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddProductWriteInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddEventStoreInfrastructure(configuration, "WriteDb");
-        services.AddScoped<IDomainEventSerializer, ProductDomainEventSerializer>();
+        services.AddWriteDbContext<ProductWriteDbContext>(configuration);
         services.AddScoped<IIntegrationEventMapper, ProductIntegrationEventMapper>();
-        services.AddServiceBusOutbox(configuration);
+        services.AddScoped<IProductWriteRepository, SqlProductWriteRepository>();
         return services;
     }
 
@@ -34,7 +32,7 @@ public static class DependencyInjection
     }
 
     public static Task InitializeProductWriteStoreAsync(this IServiceProvider sp) =>
-        sp.InitializeEventStoreAsync();
+        sp.InitializeWriteStoreAsync<ProductWriteDbContext>();
 
     public static async Task InitializeProductReadStoreAsync(this IServiceProvider sp)
     {

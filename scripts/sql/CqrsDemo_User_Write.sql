@@ -19,24 +19,18 @@ CREATE TABLE [OutboxMessages] (
 GO
 
 
-CREATE TABLE [StoredEvents] (
+CREATE TABLE [Users] (
     [Id] uniqueidentifier NOT NULL,
-    [StreamId] uniqueidentifier NOT NULL,
-    [StreamType] nvarchar(100) NOT NULL,
-    [Version] bigint NOT NULL,
-    [EventType] nvarchar(200) NOT NULL,
-    [Payload] nvarchar(max) NOT NULL,
-    [OccurredOn] datetime2 NOT NULL,
-    CONSTRAINT [PK_StoredEvents] PRIMARY KEY ([Id])
+    [Email] nvarchar(320) NOT NULL,
+    [DisplayName] nvarchar(200) NOT NULL,
+    [IsActive] bit NOT NULL,
+    [RegisteredAt] datetime2 NOT NULL,
+    CONSTRAINT [PK_Users] PRIMARY KEY ([Id])
 );
 GO
 
 
 CREATE INDEX [IX_OutboxMessages_ProcessedAt_OccurredOn] ON [OutboxMessages] ([ProcessedAt], [OccurredOn]);
-GO
-
-
-CREATE UNIQUE INDEX [IX_StoredEvents_StreamId_StreamType_Version] ON [StoredEvents] ([StreamId], [StreamType], [Version]);
 GO
 
 

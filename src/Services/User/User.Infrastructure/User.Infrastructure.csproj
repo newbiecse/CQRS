@@ -12,7 +12,6 @@
   <ItemGroup>
     <ProjectReference Include="..\User.Application\User.Application.csproj" />
     <ProjectReference Include="..\User.Domain\User.Domain.csproj" />
-    <ProjectReference Include="..\..\..\BuildingBlocks\CqrsDemo.BuildingBlocks.EventStore\CqrsDemo.BuildingBlocks.EventStore.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\CqrsDemo.BuildingBlocks.Messaging\CqrsDemo.BuildingBlocks.Messaging.csproj" />
     <ProjectReference Include="..\..\..\CqrsDemo.Contracts\CqrsDemo.Contracts.csproj" />
   </ItemGroup>

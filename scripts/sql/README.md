@@ -42,7 +42,7 @@ dotnet run --project tools/CqrsDemo.DatabaseInitializer -- --export-sql
 
 | Database | Tables |
 |----------|--------|
-| `CqrsDemo_Product_Write`, `CqrsDemo_Cart_Write`, `CqrsDemo_Order_Write`, `CqrsDemo_Payment_Write`, `CqrsDemo_User_Write` | `StoredEvents`, `OutboxMessages` |
+| `CqrsDemo_*_Write` | Domain state tables (`Products`, `Carts`, `Orders`, …) + `OutboxMessages` |
 | `CqrsDemo_Product_Read` | `Products` |
 | `CqrsDemo_Cart_Read` | `Carts`, `CartLines` |
 | `CqrsDemo_Order_Read` | `Orders`, `OrderLines` |

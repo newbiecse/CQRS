@@ -5,24 +5,23 @@ using MediatR;
 
 namespace CqrsDemo.Commands.Application.Payments.Commands.PayOrder;
 
-public sealed class PayOrderCommandHandler(IEventStore eventStore)
+public sealed class PayOrderCommandHandler(
+    IOrderWriteRepository orderRepository,
+    IPaymentWriteRepository paymentRepository)
     : IRequestHandler<PayOrderCommand, Guid>
 {
     public async Task<Guid> Handle(PayOrderCommand request, CancellationToken cancellationToken)
     {
-        var order = await eventStore.LoadAsync(
-            request.OrderId,
-            Order.StreamType,
-            Order.LoadFromHistory,
-            cancellationToken) ?? throw new KeyNotFoundException($"Order {request.OrderId} was not found.");
+        var order = await orderRepository.GetByIdAsync(request.OrderId, cancellationToken)
+            ?? throw new KeyNotFoundException($"Order {request.OrderId} was not found.");
 
         var payment = Payment.Initiate(order.Id, order.TotalAmount);
         payment.Complete();
 
-        await eventStore.SaveNewAsync(payment, Payment.StreamType, cancellationToken);
+        await paymentRepository.AddAsync(payment, cancellationToken);
 
         order.MarkAsPaid(payment.Id, payment.Amount);
-        await eventStore.SaveAsync(order, Order.StreamType, cancellationToken);
+        await orderRepository.UpdateAsync(order, cancellationToken);
 
         return payment.Id;
     }

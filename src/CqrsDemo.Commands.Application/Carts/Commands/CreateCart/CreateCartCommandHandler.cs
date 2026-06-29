@@ -4,13 +4,13 @@ using MediatR;
 
 namespace CqrsDemo.Commands.Application.Carts.Commands.CreateCart;
 
-public sealed class CreateCartCommandHandler(IEventStore eventStore)
+public sealed class CreateCartCommandHandler(ICartWriteRepository repository)
     : IRequestHandler<CreateCartCommand, Guid>
 {
     public async Task<Guid> Handle(CreateCartCommand request, CancellationToken cancellationToken)
     {
         var cart = Cart.Create(request.CustomerId);
-        await eventStore.SaveNewAsync(cart, Cart.StreamType, cancellationToken);
+        await repository.AddAsync(cart, cancellationToken);
         return cart.Id;
     }
 }

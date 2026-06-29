@@ -5,22 +5,21 @@ using MediatR;
 
 namespace CqrsDemo.Commands.Application.Orders.Commands.CheckoutCart;
 
-public sealed class CheckoutCartCommandHandler(IEventStore eventStore)
+public sealed class CheckoutCartCommandHandler(
+    ICartWriteRepository cartRepository,
+    IOrderWriteRepository orderRepository)
     : IRequestHandler<CheckoutCartCommand, Guid>
 {
     public async Task<Guid> Handle(CheckoutCartCommand request, CancellationToken cancellationToken)
     {
-        var cart = await eventStore.LoadAsync(
-            request.CartId,
-            Cart.StreamType,
-            Cart.LoadFromHistory,
-            cancellationToken) ?? throw new KeyNotFoundException($"Cart {request.CartId} was not found.");
+        var cart = await cartRepository.GetByIdAsync(request.CartId, cancellationToken)
+            ?? throw new KeyNotFoundException($"Cart {request.CartId} was not found.");
 
         var order = Order.Create(cart.CustomerId, cart.Id, cart.Items.ToList());
-        await eventStore.SaveNewAsync(order, Order.StreamType, cancellationToken);
+        await orderRepository.AddAsync(order, cancellationToken);
 
         cart.Checkout(order.Id);
-        await eventStore.SaveAsync(cart, Cart.StreamType, cancellationToken);
+        await cartRepository.UpdateAsync(cart, cancellationToken);
 
         return order.Id;
     }

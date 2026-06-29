@@ -1,14 +1,13 @@
-using CqrsDemo.BuildingBlocks.EventStore;
-using CqrsDemo.BuildingBlocks.EventStore.Abstractions;
 using CqrsDemo.BuildingBlocks.Messaging;
-using CqrsDemo.BuildingBlocks.EventStore.Persistence;
+using CqrsDemo.BuildingBlocks.Messaging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Payment.Application.Abstractions;
-using Payment.Infrastructure.EventStore;
 using Payment.Infrastructure.Http;
+using Payment.Infrastructure.Integration;
 using Payment.Infrastructure.Persistence.Read;
+using Payment.Infrastructure.Persistence.Write;
 using Payment.Infrastructure.Projections;
 
 namespace Payment.Infrastructure;
@@ -17,10 +16,9 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddPaymentWriteInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddEventStoreInfrastructure(configuration, "WriteDb");
-        services.AddScoped<IDomainEventSerializer, PaymentDomainEventSerializer>();
+        services.AddWriteDbContext<PaymentWriteDbContext>(configuration);
         services.AddScoped<IIntegrationEventMapper, PaymentIntegrationEventMapper>();
-        services.AddServiceBusOutbox(configuration);
+        services.AddScoped<IPaymentWriteRepository, SqlPaymentWriteRepository>();
         services.AddOrderServiceClient(configuration);
         return services;
     }
@@ -35,11 +33,8 @@ public static class DependencyInjection
         return services;
     }
 
-    public static async Task InitializePaymentWriteStoreAsync(this IServiceProvider serviceProvider)
-    {
-        using var scope = serviceProvider.CreateScope();
-        await scope.ServiceProvider.GetRequiredService<EventStoreDbContext>().Database.EnsureCreatedAsync();
-    }
+    public static Task InitializePaymentWriteStoreAsync(this IServiceProvider serviceProvider) =>
+        serviceProvider.InitializeWriteStoreAsync<PaymentWriteDbContext>();
 
     public static async Task InitializePaymentReadStoreAsync(this IServiceProvider serviceProvider)
     {

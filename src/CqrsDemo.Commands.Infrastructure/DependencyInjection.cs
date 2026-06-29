@@ -1,9 +1,8 @@
+using CqrsDemo.BuildingBlocks.Messaging;
+using CqrsDemo.BuildingBlocks.Messaging.Abstractions;
 using CqrsDemo.Commands.Application.Abstractions;
-using CqrsDemo.Commands.Infrastructure.Outbox;
-using CqrsDemo.Commands.Infrastructure.Persistence.EventStore;
+using CqrsDemo.Commands.Infrastructure.Integration;
 using CqrsDemo.Commands.Infrastructure.Persistence.Write;
-using CqrsDemo.Messaging;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -15,24 +14,16 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        var writeConnection = configuration.GetConnectionString("WriteDb")
-            ?? throw new InvalidOperationException("Connection string 'WriteDb' is not configured.");
-
-        services.AddDbContext<WriteDbContext>(options =>
-            options.UseSqlServer(writeConnection));
-
-        services.AddScoped<IEventStore, SqlEventStore>();
-        services.AddScoped<IProductWriteUnitOfWork, EventSourcedProductRepository>();
-        services.AddAzureServiceBusMessaging(configuration);
-        services.AddHostedService<OutboxPublisherBackgroundService>();
+        services.AddWriteDbContext<WriteDbContext>(configuration);
+        services.AddScoped<IIntegrationEventMapper, MonolithIntegrationEventMapper>();
+        services.AddScoped<IProductWriteRepository, SqlProductWriteRepository>();
+        services.AddScoped<ICartWriteRepository, SqlCartWriteRepository>();
+        services.AddScoped<IOrderWriteRepository, SqlOrderWriteRepository>();
+        services.AddScoped<IPaymentWriteRepository, SqlPaymentWriteRepository>();
 
         return services;
     }
 
-    public static async Task MigrateCommandsDatabaseAsync(this IServiceProvider serviceProvider)
-    {
-        using var scope = serviceProvider.CreateScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<WriteDbContext>();
-        await dbContext.Database.MigrateAsync();
-    }
+    public static Task MigrateCommandsDatabaseAsync(this IServiceProvider serviceProvider) =>
+        serviceProvider.InitializeWriteStoreAsync<WriteDbContext>();
 }

@@ -5,8 +5,9 @@ using CqrsDemo.Contracts.Orders;
 using CqrsDemo.Contracts.Payments;
 using CqrsDemo.Contracts.Products;
 using CqrsDemo.Contracts.Serialization;
+using CqrsDemo.BuildingBlocks.Domain;
+using CqrsDemo.BuildingBlocks.Messaging.Abstractions;
 using CqrsDemo.Domain.Carts.Events;
-using CqrsDemo.Domain.Common;
 using CqrsDemo.Domain.Orders.Events;
 using CqrsDemo.Domain.Payments.Events;
 using CqrsDemo.Domain.Products.Events;
@@ -106,5 +107,3 @@ public static class DomainEventToOutboxMapper
     private static OrderLineDto ToDto(OrderLine line) =>
         new(line.ProductId, line.ProductName, line.UnitPrice, line.Quantity);
 }
-
-public sealed record OutboxMessageDto(string EventType, string Payload);

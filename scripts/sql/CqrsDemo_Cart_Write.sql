@@ -6,6 +6,16 @@ GO
 USE [CqrsDemo_Cart_Write];
 GO
 
+CREATE TABLE [Carts] (
+    [Id] uniqueidentifier NOT NULL,
+    [CustomerId] uniqueidentifier NOT NULL,
+    [Status] nvarchar(50) NOT NULL,
+    [CreatedAt] datetime2 NOT NULL,
+    CONSTRAINT [PK_Carts] PRIMARY KEY ([Id])
+);
+GO
+
+
 CREATE TABLE [OutboxMessages] (
     [Id] uniqueidentifier NOT NULL,
     [EventType] nvarchar(200) NOT NULL,
@@ -19,24 +29,19 @@ CREATE TABLE [OutboxMessages] (
 GO
 
 
-CREATE TABLE [StoredEvents] (
-    [Id] uniqueidentifier NOT NULL,
-    [StreamId] uniqueidentifier NOT NULL,
-    [StreamType] nvarchar(100) NOT NULL,
-    [Version] bigint NOT NULL,
-    [EventType] nvarchar(200) NOT NULL,
-    [Payload] nvarchar(max) NOT NULL,
-    [OccurredOn] datetime2 NOT NULL,
-    CONSTRAINT [PK_StoredEvents] PRIMARY KEY ([Id])
+CREATE TABLE [CartItems] (
+    [CartId] uniqueidentifier NOT NULL,
+    [ProductId] uniqueidentifier NOT NULL,
+    [ProductName] nvarchar(200) NOT NULL,
+    [UnitPrice] decimal(18,2) NOT NULL,
+    [Quantity] int NOT NULL,
+    CONSTRAINT [PK_CartItems] PRIMARY KEY ([CartId], [ProductId]),
+    CONSTRAINT [FK_CartItems_Carts_CartId] FOREIGN KEY ([CartId]) REFERENCES [Carts] ([Id]) ON DELETE CASCADE
 );
 GO
 
 
 CREATE INDEX [IX_OutboxMessages_ProcessedAt_OccurredOn] ON [OutboxMessages] ([ProcessedAt], [OccurredOn]);
-GO
-
-
-CREATE UNIQUE INDEX [IX_StoredEvents_StreamId_StreamType_Version] ON [StoredEvents] ([StreamId], [StreamType], [Version]);
 GO
 
 

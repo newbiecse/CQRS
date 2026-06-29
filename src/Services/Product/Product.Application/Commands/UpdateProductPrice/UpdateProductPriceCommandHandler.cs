@@ -1,17 +1,17 @@
-using CqrsDemo.BuildingBlocks.EventStore.Abstractions;
 using MediatR;
+using Product.Application.Abstractions;
 using Product.Domain;
 
 namespace Product.Application.Commands.UpdateProductPrice;
 
-public sealed class UpdateProductPriceCommandHandler(IEventStore eventStore)
+public sealed class UpdateProductPriceCommandHandler(IProductWriteRepository repository)
     : IRequestHandler<UpdateProductPriceCommand>
 {
     public async Task Handle(UpdateProductPriceCommand request, CancellationToken ct)
     {
-        var product = await eventStore.LoadAsync(request.ProductId, ProductAggregate.StreamType, ProductAggregate.Load, ct)
+        var product = await repository.GetByIdAsync(request.ProductId, ct)
             ?? throw new KeyNotFoundException($"Product {request.ProductId} not found.");
         product.UpdatePrice(request.NewPrice);
-        await eventStore.SaveAsync(product, ProductAggregate.StreamType, ct);
+        await repository.UpdateAsync(product, ct);
     }
 }

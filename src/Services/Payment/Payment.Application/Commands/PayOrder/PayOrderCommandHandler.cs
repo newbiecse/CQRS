@@ -1,11 +1,10 @@
-using CqrsDemo.BuildingBlocks.EventStore.Abstractions;
 using MediatR;
 using Payment.Application.Abstractions;
 using Payment.Domain;
 
 namespace Payment.Application.Commands.PayOrder;
 
-public sealed class PayOrderCommandHandler(IEventStore eventStore, IOrderServiceClient orderServiceClient)
+public sealed class PayOrderCommandHandler(IPaymentWriteRepository repository, IOrderServiceClient orderServiceClient)
     : IRequestHandler<PayOrderCommand, Guid>
 {
     public async Task<Guid> Handle(PayOrderCommand request, CancellationToken cancellationToken)
@@ -18,7 +17,8 @@ public sealed class PayOrderCommandHandler(IEventStore eventStore, IOrderService
             payment.Fail("Simulated payment failure for saga compensation demo.");
         else
             payment.Complete();
-        await eventStore.SaveNewAsync(payment, PaymentAggregate.StreamType, cancellationToken);
+
+        await repository.AddAsync(payment, cancellationToken);
         return payment.Id;
     }
 }
