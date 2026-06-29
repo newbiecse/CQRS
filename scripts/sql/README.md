@@ -13,7 +13,7 @@ From repo root:
 Or:
 
 ```bash
-dotnet run --project tools/CqrsDemo.DatabaseInitializer/CqrsDemo.DatabaseInitializer.csproj -c Release
+dotnet run --project backend/tools/CqrsDemo.DatabaseInitializer/CqrsDemo.DatabaseInitializer.csproj -c Release
 ```
 
 Uses **EF Core `EnsureCreated`** against the same models as the microservices (`*DbContext`).
@@ -35,7 +35,7 @@ sqlcmd -S localhost -E -i scripts\sql\CqrsDemo_Product_Write.sql
 Export scripts again after model changes:
 
 ```bash
-dotnet run --project tools/CqrsDemo.DatabaseInitializer -- --export-sql
+dotnet run --project backend/tools/CqrsDemo.DatabaseInitializer -- --export-sql
 ```
 
 ## Databases

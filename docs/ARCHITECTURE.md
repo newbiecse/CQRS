@@ -370,7 +370,7 @@ flowchart TB
     subgraph src
         BB[BuildingBlocks<br/>Domain · EventStore · Messaging]
         CT[CqrsDemo.Contracts]
-        GW[src/Gateway]
+        GW[backend/src/Gateway]
         subgraph Services
             PR[Product/*]
             CA[Cart/*]
@@ -414,7 +414,7 @@ flowchart LR
     Apps --> SBEmu
 ```
 
-Config: `docker/docker-compose.yml` (SQL Server + Kafka).
+Config: `infra/docker/docker-compose.yml` (SQL Server + Kafka).
 
 ---
 

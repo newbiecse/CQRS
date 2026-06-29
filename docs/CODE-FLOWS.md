@@ -11,7 +11,7 @@ Related docs: [ARCHITECTURE.md](./ARCHITECTURE.md) · [DATABASE-SCHEMA.md](./DAT
 Every bounded context follows the same shape:
 
 ```text
-src/Services/{Domain}/
+backend/src/Services/{Domain}/
 ├── {Domain}.Domain/           Aggregates, domain events, business rules
 ├── {Domain}.Application/      MediatR commands/queries, handlers
 ├── {Domain}.Infrastructure/   Event store serializers, mappers, read DB, DI
@@ -19,13 +19,12 @@ src/Services/{Domain}/
 ├── {Domain}.Queries.Api/      HTTP read API (port 521x)
 └── {Domain}.Projection.Worker Service Bus consumer → update read DB
 
-src/BuildingBlocks/
+backend/src/BuildingBlocks/
 ├── CqrsDemo.BuildingBlocks.Domain       Entity, AggregateRoot, IDomainEvent
-├── CqrsDemo.BuildingBlocks.EventStore   SqlEventStore, EventStoreDbContext
-└── CqrsDemo.BuildingBlocks.Messaging    Outbox publisher, Service Bus consumer base
+└── CqrsDemo.BuildingBlocks.Messaging    Outbox publisher, MassTransit Kafka
 
-src/CqrsDemo.Contracts/        Integration event DTOs + event type constants
-src/Services/Saga/             Checkout orchestration (separate from domains)
+backend/src/CqrsDemo.Contracts/        Integration event DTOs + event type constants
+backend/src/Services/Saga/             Checkout orchestration (separate from domains)
 ```
 
 | Layer | Typical types | Role |
@@ -326,7 +325,7 @@ http://localhost:5000/checkout-saga/api/sagas/checkout
         → http://localhost:5205/api/sagas/checkout
 ```
 
-Config: `src/Gateway/Shop.Gateway.Api/appsettings.json` (`ReverseProxy:Routes` + `Clusters`).
+Config: `backend/src/Gateway/Shop.Gateway.Api/appsettings.json` (`ReverseProxy:Routes` + `Clusters`).
 
 ---
 
@@ -397,4 +396,4 @@ Constants: `CqrsDemo.Contracts/Messaging/KafkaConsumerGroups.cs` and `Integratio
 
 ---
 
-For distributed flows, trace **`src/Services/*`** and **`src/BuildingBlocks/*`**.
+For distributed flows, trace **`backend/src/Services/*`** and **`backend/src/BuildingBlocks/*`**.

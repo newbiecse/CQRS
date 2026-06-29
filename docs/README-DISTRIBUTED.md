@@ -2,7 +2,7 @@
 
 Domain-based microservices with **Event Sourcing**, **transactional outbox**, **Azure Service Bus** (`shop-events` topic), and a **Checkout Saga** orchestrator.
 
-**Architecture diagrams:** [ARCHITECTURE.md](./ARCHITECTURE.md) · **Code flows:** [CODE-FLOWS.md](./CODE-FLOWS.md) · **Database schemas:** [DATABASE-SCHEMA.md](./DATABASE-SCHEMA.md) · **Visual DB diagrams:** open [docs/database-diagrams/index.html](./docs/database-diagrams/index.html) in a browser
+**Architecture diagrams:** [ARCHITECTURE.md](./ARCHITECTURE.md) · **Code flows:** [CODE-FLOWS.md](./CODE-FLOWS.md) · **Database schemas:** [DATABASE-SCHEMA.md](./DATABASE-SCHEMA.md) · **Visual DB diagrams:** open [database-diagrams/index.html](./database-diagrams/index.html) in a browser
 
 ## Services (21 deployables)
 
@@ -16,6 +16,7 @@ Domain-based microservices with **Event Sourcing**, **transactional outbox**, **
 | **Payment** | :5204 | :5214 | Payment.Projection.Worker |
 | **Checkout Saga** | :5205 | — | **CheckoutSaga.Worker** |
 | **Gateway** | :5000 (YARP) | | |
+| **Admin API** | :5100 (BFF) | | Admin portal |
 
 Each domain has **its own databases**:
 - `CqrsDemo_{Domain}_Write` — event store + outbox
@@ -83,13 +84,14 @@ curl -X POST http://localhost:5205/api/sagas/checkout \
 ## Build & run
 
 ```bash
-dotnet build CqrsDemo.Distributed.sln
-docker compose -f docker/docker-compose.yml up -d
-dotnet run --project tools/CqrsDemo.DatabaseInitializer
+dotnet build backend/CqrsDemo.Distributed.sln
+docker compose -f infra/docker/docker-compose.yml up -d
+dotnet run --project backend/tools/CqrsDemo.DatabaseInitializer
+dotnet run --project backend/src/Gateway/Shop.Admin.Api
 # See scripts/run-distributed.sh for all processes
 ```
 
-**Local infrastructure** (`docker/docker-compose.yml`):
+**Local infrastructure** (`infra/docker/docker-compose.yml`):
 
 | Service | Endpoint | Credentials |
 |---------|----------|-------------|

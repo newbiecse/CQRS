@@ -16,7 +16,7 @@ const string connectionTemplate =
     "Server=localhost,1433;Database={0};User Id=sa;Password=Your_password123;TrustServerCertificate=True;";
 
 var exportSql = args.Contains("--export-sql", StringComparer.OrdinalIgnoreCase);
-var repoRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", ".."));
+var repoRoot = FindRepoRoot();
 var sqlOutputDir = Path.Combine(repoRoot, "scripts", "sql");
 
 var targets = new (string Database, Func<string, DbContext> CreateContext)[]
@@ -60,6 +60,23 @@ foreach (var (database, createContext) in targets)
 
 Console.WriteLine();
 Console.WriteLine("All databases initialized.");
+
+static string FindRepoRoot()
+{
+    var directory = new DirectoryInfo(AppContext.BaseDirectory);
+    while (directory is not null)
+    {
+        if (File.Exists(Path.Combine(directory.FullName, "README.md"))
+            && Directory.Exists(Path.Combine(directory.FullName, "backend")))
+        {
+            return directory.FullName;
+        }
+
+        directory = directory.Parent;
+    }
+
+    throw new InvalidOperationException("Repository root not found.");
+}
 
 static TContext Create<TContext>(string connection) where TContext : DbContext
 {
