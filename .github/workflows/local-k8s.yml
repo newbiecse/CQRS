@@ -1,0 +1,110 @@
+name: Local Kubernetes
+
+# Builds container images and deploys to a local-style K8s cluster.
+# - GitHub-hosted runners: creates a kind cluster (matches local NodePort ports).
+# - Self-hosted runners: set CLUSTER_PROVIDER=existing to use Docker Desktop / minikube.
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Helm / Kustomize environment
+        type: choice
+        options: [dev, staging, prod]
+        default: dev
+      cluster_provider:
+        description: kind (ephemeral CI cluster) or existing (self-hosted local K8s)
+        type: choice
+        options: [kind, existing]
+        default: kind
+      skip_build:
+        description: Skip Docker image build (images already loaded)
+        type: boolean
+        default: false
+  push:
+    branches: [main]
+    paths:
+      - "backend/**"
+      - "frontend/shop/**"
+      - "infra/**"
+      - "scripts/**"
+      - ".github/workflows/local-k8s.yml"
+
+concurrency:
+  group: local-k8s-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  REGISTRY: cqrsdemo
+  ENVIRONMENT: ${{ github.event.inputs.environment || 'dev' }}
+  CLUSTER_PROVIDER: ${{ github.event.inputs.cluster_provider || 'kind' }}
+
+jobs:
+  deploy:
+    name: Build & deploy to local K8s
+    runs-on: ${{ github.event.inputs.cluster_provider == 'existing' && 'self-hosted' || 'ubuntu-latest' }}
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Build backend (verify)
+        run: |
+          dotnet build backend/CqrsDemo.Distributed.sln -c Release
+
+      - name: Create kind cluster
+        if: env.CLUSTER_PROVIDER == 'kind'
+        uses: helm/kind-action@v1
+        with:
+          cluster_name: cqrs-demo
+          config: infra/k8s/kind/kind-config.yaml
+          wait: 300s
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.16.3
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Verify cluster
+        run: kubectl cluster-info
+
+      - name: Deploy to Kubernetes
+        env:
+          TAG: ci-${{ github.sha }}
+          SKIP_BUILD: ${{ github.event.inputs.skip_build || 'false' }}
+          CLUSTER_PROVIDER: ${{ env.CLUSTER_PROVIDER }}
+          ENVIRONMENT: ${{ env.ENVIRONMENT }}
+          REGISTRY: ${{ env.REGISTRY }}
+        run: |
+          chmod +x scripts/ci-local-k8s.sh scripts/build-container-images.sh
+          ./scripts/ci-local-k8s.sh
+
+      - name: Smoke test — gateway HTTP
+        if: env.CLUSTER_PROVIDER == 'kind'
+        run: |
+          for i in $(seq 1 30); do
+            if curl -sf -o /dev/null "http://localhost:30500/product-queries/api/products/search?q=phone"; then
+              echo "Gateway responded OK"
+              exit 0
+            fi
+            echo "Waiting for gateway... ($i/30)"
+            sleep 10
+          done
+          echo "Gateway smoke test failed"
+          kubectl get pods -n cqrs-demo
+          kubectl logs -n cqrs-demo -l app=shop-gateway --tail=50 || true
+          exit 1
+
+      - name: Dump diagnostics on failure
+        if: failure()
+        run: |
+          kubectl get pods -A || true
+          kubectl get events -n cqrs-demo --sort-by='.lastTimestamp' | tail -30 || true
+          kubectl describe pods -n cqrs-demo | tail -80 || true

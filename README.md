@@ -224,6 +224,29 @@ helmfile -e dev apply
 
 Details: [infra/README.md](infra/README.md) · [infra/helm/README.md](infra/helm/README.md) · [infra/k8s/overlays/local/README.md](infra/k8s/overlays/local/README.md)
 
+**Linux / macOS script (same steps as `deploy-local-k8s.ps1`):**
+
+```bash
+export CLUSTER_PROVIDER=existing   # or kind
+./scripts/ci-local-k8s.sh
+```
+
+---
+
+## GitHub Actions
+
+| Workflow | When | What |
+|----------|------|------|
+| [CI](.github/workflows/ci.yml) | Push / PR → `main` | Build backend, frontends, Docker images |
+| [Local Kubernetes](.github/workflows/local-k8s.yml) | Push `main` (selected paths) or manual | Deploy full stack to **kind** (CI) or **self-hosted** local K8s |
+
+See **[.github/README.md](.github/README.md)** for self-hosted runner setup and workflow inputs.
+
+```bash
+# Same deploy logic as the Local Kubernetes workflow (on your machine)
+CLUSTER_PROVIDER=kind ./scripts/ci-local-k8s.sh
+```
+
 ---
 
 ## Documentation
@@ -251,4 +274,5 @@ Details: [infra/README.md](infra/README.md) · [infra/helm/README.md](infra/helm
 | `run-fe-admin.ps1` / `run-fe-shop.ps1` | Frontend dev servers |
 | `build-container-images.ps1` | Build Docker images for K8s |
 | `deploy-local-k8s.ps1` | Deploy full stack to local Kubernetes |
+| `ci-local-k8s.sh` | Same deploy flow for Linux/macOS and GitHub Actions |
 | `generate-helm-values.ps1` | Regenerate Helm `values*.yaml` after adding a service |

@@ -1,0 +1,28 @@
+# kind cluster for local / CI Kubernetes (NodePort access from the runner host).
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: cqrs-demo
+nodes:
+  - role: control-plane
+    kubeadmConfigPatches:
+      - |
+        kind: InitConfiguration
+        nodeRegistration:
+          kubeletExtraArgs:
+            node-labels: "ingress-ready=true"
+    extraPortMappings:
+      - containerPort: 30500
+        hostPort: 30500
+        protocol: TCP
+      - containerPort: 30510
+        hostPort: 30510
+        protocol: TCP
+      - containerPort: 30501
+        hostPort: 30501
+        protocol: TCP
+      - containerPort: 80
+        hostPort: 8080
+        protocol: TCP
+      - containerPort: 443
+        hostPort: 8443
+        protocol: TCP
