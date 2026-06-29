@@ -10,27 +10,20 @@ services:
     volumes:
       - sqlserver_data:/var/opt/mssql
 
-  servicebus-emulator:
-    image: mcr.microsoft.com/azure-messaging/servicebus-emulator:1.1.2
-    container_name: cqrs-demo-servicebus
-    depends_on:
-      - sqledge
+  kafka:
+    image: bitnami/kafka:3.7
+    container_name: cqrs-demo-kafka
     ports:
-      - "5672:5672"
-      - "5300:5300"
+      - "9092:9092"
     environment:
-      SQL_SERVER: sqledge
-      MSSQL_SA_PASSWORD: "Your_password123"
-      ACCEPT_EULA: "Y"
-    volumes:
-      - ./infrastructure/servicebus-emulator-config.json:/ServiceBus_Emulator/Config/Config.json
-
-  sqledge:
-    image: mcr.microsoft.com/azure-sql-edge:latest
-    container_name: cqrs-demo-sqledge
-    environment:
-      ACCEPT_EULA: "Y"
-      MSSQL_SA_PASSWORD: "Your_password123"
+      KAFKA_CFG_NODE_ID: 0
+      KAFKA_CFG_PROCESS_ROLES: controller,broker
+      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 0@kafka:9093
+      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      ALLOW_PLAINTEXT_LISTENER: "yes"
 
 volumes:
   sqlserver_data:

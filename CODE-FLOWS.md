@@ -393,16 +393,8 @@ Source: `src/BuildingBlocks/CqrsDemo.BuildingBlocks.Messaging/ServiceBusConsumer
 | `Payment.Projection.Worker` | `payment-projection` | payment events |
 | `CheckoutSaga.Worker` | `checkout-saga-orchestration` | `order.created`, `payment.completed`, `payment.failed` |
 
-Constants: `CqrsDemo.Contracts/Messaging/ServiceBusSubscriptions.cs` and `IntegrationEventTypes.cs`.
+Constants: `CqrsDemo.Contracts/Messaging/KafkaConsumerGroups.cs` and `IntegrationEventTypes.cs`.
 
 ---
 
-## 12. Legacy monolith (`src/CqrsDemo.*`)
-
-Older single-database demo uses **MediatR domain event handlers** (in-process) instead of outbox + Service Bus for some paths. It is **not** part of `CqrsDemo.Distributed.sln` run scripts.
-
-For distributed flows, always trace **`src/Services/*`** and **`src/BuildingBlocks/*`**.
-
----
-
-*Tip: set breakpoints in `SqlEventStore.AppendAsync`, `OutboxPublisherBackgroundService.PublishBatchAsync`, and your domain `*CommandHandler` to follow one command end-to-end.*
+For distributed flows, trace **`src/Services/*`** and **`src/BuildingBlocks/*`**.

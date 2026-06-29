@@ -19,7 +19,7 @@ public static class DependencyInjection
         services.AddDbContext<CheckoutSagaDbContext>(o => o.UseSqlServer(connection));
         services.AddScoped<ICheckoutSagaRepository, SqlCheckoutSagaRepository>();
         services.AddShopServiceClients(configuration);
-        services.AddServiceBusPublisher(configuration);
+        services.AddKafkaProducer(configuration);
         services.AddSingleton<ICheckoutSagaNotifier, CheckoutSagaNotifier>();
         return services;
     }

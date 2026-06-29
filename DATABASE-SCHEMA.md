@@ -568,9 +568,3 @@ WHERE State NOT IN ('Completed', 'Compensated', 'Failed');
 ```
 
 Adjust database name per service (`CqrsDemo_Order_Read`, etc.).
-
----
-
-## Legacy monolith databases
-
-`src/CqrsDemo.*` may use `CqrsDemo_Write` / `CqrsDemo_Read` with a different layout (non–event-store product tables). **This document applies only to the distributed solution under `src/Services/`.**

@@ -1,12 +1,13 @@
 using Cart.Infrastructure;
-using Cart.Projection.Worker;
-using CqrsDemo.BuildingBlocks.Messaging.Options;
-using Microsoft.Extensions.DependencyInjection;
+using Cart.Projection.Worker.Consumers;
+using CqrsDemo.BuildingBlocks.Messaging;
+using CqrsDemo.Contracts.Messaging;
 
 var builder = Host.CreateApplicationBuilder(args);
-builder.Services.Configure<AzureServiceBusOptions>(builder.Configuration.GetSection(AzureServiceBusOptions.SectionName));
 builder.Services.AddCartReadInfrastructure(builder.Configuration);
-builder.Services.AddHostedService<CartProjectionProcessor>();
+builder.Services.AddKafkaConsumer<CartProjectionConsumer>(
+    builder.Configuration,
+    KafkaConsumerGroups.CartProjection);
 
 var host = builder.Build();
 await host.Services.InitializeCartReadStoreAsync();

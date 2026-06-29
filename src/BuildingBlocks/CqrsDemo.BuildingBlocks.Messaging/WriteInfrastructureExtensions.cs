@@ -18,7 +18,7 @@ public static class WriteInfrastructureExtensions
 
         services.AddDbContext<TContext>(options => options.UseSqlServer(connection));
         services.AddScoped<IOutboxDbContext>(sp => sp.GetRequiredService<TContext>());
-        services.AddServiceBusOutbox(configuration);
+        services.AddKafkaOutbox(configuration);
         return services;
     }
 

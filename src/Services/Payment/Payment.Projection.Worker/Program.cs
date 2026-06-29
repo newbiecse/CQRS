@@ -1,11 +1,13 @@
-using CqrsDemo.BuildingBlocks.Messaging.Options;
+using CqrsDemo.BuildingBlocks.Messaging;
+using CqrsDemo.Contracts.Messaging;
 using Payment.Infrastructure;
-using Payment.Projection.Worker;
+using Payment.Projection.Worker.Consumers;
 
 var builder = Host.CreateApplicationBuilder(args);
-builder.Services.Configure<AzureServiceBusOptions>(builder.Configuration.GetSection(AzureServiceBusOptions.SectionName));
 builder.Services.AddPaymentReadInfrastructure(builder.Configuration);
-builder.Services.AddHostedService<PaymentProjectionProcessor>();
+builder.Services.AddKafkaConsumer<PaymentProjectionConsumer>(
+    builder.Configuration,
+    KafkaConsumerGroups.PaymentProjection);
 
 var host = builder.Build();
 await host.Services.InitializePaymentReadStoreAsync();

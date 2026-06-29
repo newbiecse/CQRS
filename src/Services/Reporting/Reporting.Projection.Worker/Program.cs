@@ -1,11 +1,13 @@
-using CqrsDemo.BuildingBlocks.Messaging.Options;
+using CqrsDemo.BuildingBlocks.Messaging;
+using CqrsDemo.Contracts.Messaging;
 using Reporting.Infrastructure;
-using Reporting.Projection.Worker;
+using Reporting.Projection.Worker.Consumers;
 
 var builder = Host.CreateApplicationBuilder(args);
-builder.Services.Configure<AzureServiceBusOptions>(builder.Configuration.GetSection(AzureServiceBusOptions.SectionName));
 builder.Services.AddReportingInfrastructure(builder.Configuration);
-builder.Services.AddHostedService<ReportingProjectionProcessor>();
+builder.Services.AddKafkaConsumer<ReportingProjectionConsumer>(
+    builder.Configuration,
+    KafkaConsumerGroups.ReportingProjection);
 
 var host = builder.Build();
 await host.Services.InitializeReportingStoreAsync();

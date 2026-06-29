@@ -28,5 +28,3 @@ GO
 GO
 :r CqrsDemo_Reporting.sql
 GO
-:r CqrsDemo_Read.sql
-GO

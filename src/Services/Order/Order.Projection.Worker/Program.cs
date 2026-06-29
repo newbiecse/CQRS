@@ -1,11 +1,13 @@
-using CqrsDemo.BuildingBlocks.Messaging.Options;
+using CqrsDemo.BuildingBlocks.Messaging;
+using CqrsDemo.Contracts.Messaging;
 using Order.Infrastructure;
-using Order.Projection.Worker;
+using Order.Projection.Worker.Consumers;
 
 var builder = Host.CreateApplicationBuilder(args);
-builder.Services.Configure<AzureServiceBusOptions>(builder.Configuration.GetSection(AzureServiceBusOptions.SectionName));
 builder.Services.AddOrderReadInfrastructure(builder.Configuration);
-builder.Services.AddHostedService<OrderProjectionProcessor>();
+builder.Services.AddKafkaConsumer<OrderProjectionConsumer>(
+    builder.Configuration,
+    KafkaConsumerGroups.OrderProjection);
 
 var host = builder.Build();
 await host.Services.InitializeOrderReadStoreAsync();

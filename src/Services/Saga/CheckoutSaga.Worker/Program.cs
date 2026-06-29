@@ -1,13 +1,15 @@
 using CheckoutSaga.Application;
 using CheckoutSaga.Infrastructure;
-using CheckoutSaga.Worker;
-using CqrsDemo.BuildingBlocks.Messaging.Options;
+using CheckoutSaga.Worker.Consumers;
+using CqrsDemo.BuildingBlocks.Messaging;
+using CqrsDemo.Contracts.Messaging;
 
 var builder = Host.CreateApplicationBuilder(args);
-builder.Services.Configure<AzureServiceBusOptions>(builder.Configuration.GetSection(AzureServiceBusOptions.SectionName));
 builder.Services.AddCheckoutSagaApplication();
 builder.Services.AddCheckoutSagaInfrastructure(builder.Configuration);
-builder.Services.AddHostedService<CheckoutSagaOrchestrationProcessor>();
+builder.Services.AddKafkaConsumer<CheckoutSagaOrchestrationConsumer>(
+    builder.Configuration,
+    KafkaConsumerGroups.CheckoutSagaOrchestration);
 
 var host = builder.Build();
 await host.Services.InitializeCheckoutSagaStoreAsync();

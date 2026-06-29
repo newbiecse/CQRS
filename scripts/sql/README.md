@@ -50,7 +50,6 @@ dotnet run --project tools/CqrsDemo.DatabaseInitializer -- --export-sql
 | `CqrsDemo_User_Read` | `Users` |
 | `CqrsDemo_Saga` | `CheckoutSagas` |
 | `CqrsDemo_Reporting` | `UserProfiles`, `OrderFacts` |
-| `CqrsDemo_Write`, `CqrsDemo_Read` | Legacy monolith schemas |
 
 Connection string template (appsettings):  
 `Server=localhost;database={name};Trusted_Connection=False;persist security info=True;Integrated Security=SSPI;`

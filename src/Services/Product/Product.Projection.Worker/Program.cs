@@ -1,12 +1,13 @@
-using CqrsDemo.BuildingBlocks.Messaging.Options;
-using Microsoft.Extensions.DependencyInjection;
+using CqrsDemo.BuildingBlocks.Messaging;
+using CqrsDemo.Contracts.Messaging;
 using Product.Infrastructure;
-using Product.Projection.Worker;
+using Product.Projection.Worker.Consumers;
 
 var builder = Host.CreateApplicationBuilder(args);
-builder.Services.Configure<AzureServiceBusOptions>(builder.Configuration.GetSection(AzureServiceBusOptions.SectionName));
 builder.Services.AddProductReadInfrastructure(builder.Configuration);
-builder.Services.AddHostedService<ProductProjectionProcessor>();
+builder.Services.AddKafkaConsumer<ProductProjectionConsumer>(
+    builder.Configuration,
+    KafkaConsumerGroups.ProductProjection);
 
 var host = builder.Build();
 await host.Services.InitializeProductReadStoreAsync();

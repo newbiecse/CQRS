@@ -131,7 +131,3 @@ curl -X POST http://localhost:5000/product-commands/api/products \
 
 curl http://localhost:5000/product-queries/api/products
 ```
-
-## Legacy monolith
-
-Older `CqrsDemo.Commands.Api` / `CqrsDemo.Queries.Api` remain in `src/` for reference. Use **`CqrsDemo.Distributed.sln`** for domain microservices.

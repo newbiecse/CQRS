@@ -1,11 +1,15 @@
-using CqrsDemo.BuildingBlocks.Messaging.Options;
+using CqrsDemo.BuildingBlocks.Messaging;
+using CqrsDemo.Contracts.Messaging;
+using Order.Application;
 using Order.Infrastructure;
-using Order.Integration.Worker;
+using Order.Integration.Worker.Consumers;
 
 var builder = Host.CreateApplicationBuilder(args);
-builder.Services.Configure<AzureServiceBusOptions>(builder.Configuration.GetSection(AzureServiceBusOptions.SectionName));
+builder.Services.AddOrderApplication();
 builder.Services.AddOrderWriteInfrastructure(builder.Configuration);
-builder.Services.AddHostedService<OrderIntegrationProcessor>();
+builder.Services.AddKafkaConsumer<OrderIntegrationConsumer>(
+    builder.Configuration,
+    KafkaConsumerGroups.OrderIntegration);
 
 var host = builder.Build();
 await host.Services.InitializeOrderWriteStoreAsync();
