@@ -12,12 +12,21 @@ using Reporting.Infrastructure.Persistence;
 using User.Infrastructure.Persistence.Read;
 using User.Infrastructure.Persistence.Write;
 
-const string connectionTemplate =
-    "Server=localhost,1433;Database={0};User Id=sa;Password=Your_password123;TrustServerCertificate=True;";
+var sqlHost = Environment.GetEnvironmentVariable("SQL_HOST") ?? "localhost";
+var sqlPort = Environment.GetEnvironmentVariable("SQL_PORT") ?? "1433";
+var sqlPassword = Environment.GetEnvironmentVariable("MSSQL_SA_PASSWORD") ?? "Your_password123";
+var connectionTemplate =
+    $"Server={sqlHost},{sqlPort};Database={{0}};User Id=sa;Password={sqlPassword};TrustServerCertificate=True;";
 
 var exportSql = args.Contains("--export-sql", StringComparer.OrdinalIgnoreCase);
-var repoRoot = FindRepoRoot();
-var sqlOutputDir = Path.Combine(repoRoot, "scripts", "sql");
+string? repoRoot = null;
+string? sqlOutputDir = null;
+if (exportSql)
+{
+    repoRoot = FindRepoRoot();
+    sqlOutputDir = Path.Combine(repoRoot, "scripts", "sql");
+    Directory.CreateDirectory(sqlOutputDir);
+}
 
 var targets = new (string Database, Func<string, DbContext> CreateContext)[]
 {
@@ -37,14 +46,12 @@ var targets = new (string Database, Func<string, DbContext> CreateContext)[]
     ("CqrsDemo_Reporting", conn => Create<ReportingDbContext>(conn)),
 };
 
-Directory.CreateDirectory(sqlOutputDir);
-
 foreach (var (database, createContext) in targets)
 {
     var connection = string.Format(connectionTemplate, database);
     await using var context = createContext(connection);
 
-    if (exportSql)
+    if (exportSql && sqlOutputDir is not null)
     {
         var script = context.Database.GenerateCreateScript();
         var scriptPath = Path.Combine(sqlOutputDir, $"{database}.sql");

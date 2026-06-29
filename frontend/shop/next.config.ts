@@ -1,11 +1,14 @@
 import type { NextConfig } from "next";
 
+const gatewayUrl = process.env.GATEWAY_URL ?? "http://localhost:5000";
+
 const nextConfig: NextConfig = {
+  output: "standalone",
   async rewrites() {
     return [
       {
         source: "/api/:path*",
-        destination: "http://localhost:5000/product-queries/api/:path*",
+        destination: `${gatewayUrl}/product-queries/api/:path*`,
       },
     ];
   },

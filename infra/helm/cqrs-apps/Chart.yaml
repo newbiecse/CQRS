@@ -1,0 +1,7 @@
+apiVersion: helm.sh/v1
+kind: Chart
+metadata:
+  name: cqrs-apps
+  description: CQRS Demo microservices
+version: 0.1.0
+appVersion: "1.0.0"

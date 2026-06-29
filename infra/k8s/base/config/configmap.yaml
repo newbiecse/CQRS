@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cqrs-shared-config
+  namespace: cqrs-demo
+data:
+  ASPNETCORE_ENVIRONMENT: "Kubernetes"
+  SQL_HOST: "sqlserver"
+  SQL_PORT: "1433"
+  SQL_USER: "sa"
+  KAFKA__BootstrapServers: "kafka:9092"
+  KAFKA__TopicName: "shop-events"
+  Elasticsearch__Url: "http://elasticsearch:9200"
+  Elasticsearch__BusinessAuditIndex: "business-audit"
+  Elasticsearch__ProductIndex: "products"
+  Observability__OtlpEndpoint: "http://otel-collector:4317"
+  Observability__ElasticsearchUrl: "http://elasticsearch:9200"
+  Observability__EnableElasticsearchLogSink: "true"
+  Observability__EnableOtlpExporter: "true"

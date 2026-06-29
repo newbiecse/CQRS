@@ -1,0 +1,15 @@
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+COPY backend/CqrsDemo.Distributed.sln ./
+COPY backend/src/ ./src/
+COPY backend/tools/ ./tools/
+
+RUN dotnet restore tools/CqrsDemo.DatabaseInitializer/CqrsDemo.DatabaseInitializer.csproj
+RUN dotnet publish tools/CqrsDemo.DatabaseInitializer/CqrsDemo.DatabaseInitializer.csproj \
+    -c Release -o /app/publish /p:UseAppHost=false
+
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+WORKDIR /app
+COPY --from=build /app/publish .
+ENTRYPOINT ["dotnet", "CqrsDemo.DatabaseInitializer.dll"]

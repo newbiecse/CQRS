@@ -1,0 +1,89 @@
+{{- define "cqrs.connectionString" -}}
+Server={{ $.Values.sql.host }},{{ $.Values.sql.port }};Database={{ . }};User Id={{ $.Values.sql.user }};Password={{ $.Values.sql.password }};TrustServerCertificate=True;
+{{- end }}
+
+{{- range .Values.services }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .name }}
+  namespace: {{ $.Values.namespace }}
+  labels:
+    app: {{ .name }}
+    app.kubernetes.io/part-of: cqrs-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .name }}
+        tier: app
+    spec:
+      containers:
+        - name: {{ .name }}
+          image: "{{ $.Values.image.registry }}/{{ .image }}:{{ $.Values.image.tag }}"
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
+          ports:
+            {{- if eq .kind "api" }}
+            - containerPort: {{ .port }}
+            {{- end }}
+          env:
+            - name: ASPNETCORE_URLS
+              value: http://+:{{ default 8080 .port }}
+            - name: MSSQL_SA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $.Values.sql.passwordSecret }}
+                  key: {{ $.Values.sql.passwordKey }}
+            - name: Kafka__BootstrapServers
+              value: {{ $.Values.kafka.bootstrapServers | quote }}
+            - name: Kafka__TopicName
+              value: {{ $.Values.kafka.topicName | quote }}
+            - name: Elasticsearch__Url
+              value: {{ $.Values.elasticsearch.url | quote }}
+            - name: Observability__OtlpEndpoint
+              value: {{ $.Values.observability.otlpEndpoint | quote }}
+            - name: Observability__ElasticsearchUrl
+              value: {{ $.Values.elasticsearch.url | quote }}
+            {{- if .writeDb }}
+            - name: ConnectionStrings__WriteDb
+              value: {{ include "cqrs.connectionString" .writeDb | quote }}
+            {{- end }}
+            {{- if .readDb }}
+            - name: ConnectionStrings__ReadDb
+              value: {{ include "cqrs.connectionString" .readDb | quote }}
+            {{- end }}
+            {{- range $key, $value := .env }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+            {{- range $key, $value := default dict .extraEnv }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+          resources:
+            requests:
+              memory: 128Mi
+              cpu: 100m
+            limits:
+              memory: 512Mi
+              cpu: 500m
+{{- if eq .kind "api" }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .name }}
+  namespace: {{ $.Values.namespace }}
+spec:
+  selector:
+    app: {{ .name }}
+  ports:
+    - port: {{ .port }}
+      targetPort: {{ .port }}
+{{- end }}
+{{- end }}

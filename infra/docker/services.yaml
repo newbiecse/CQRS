@@ -1,0 +1,130 @@
+services:
+  - name: shop-gateway
+    projectPath: src/Gateway/Shop.Gateway.Api/Shop.Gateway.Api.csproj
+    entryDll: Shop.Gateway.Api.dll
+    kind: api
+    port: 8080
+  - name: shop-admin-api
+    projectPath: src/Gateway/Shop.Admin.Api/Shop.Admin.Api.csproj
+    entryDll: Shop.Admin.Api.dll
+    kind: api
+    port: 8080
+  - name: product-commands
+    projectPath: src/Services/Product/Product.Commands.Api/Product.Commands.Api.csproj
+    entryDll: Product.Commands.Api.dll
+    kind: api
+    port: 8080
+    writeDb: CqrsDemo_Product_Write
+  - name: product-queries
+    projectPath: src/Services/Product/Product.Queries.Api/Product.Queries.Api.csproj
+    entryDll: Product.Queries.Api.dll
+    kind: api
+    port: 8080
+    readDb: CqrsDemo_Product_Read
+  - name: product-projection-worker
+    projectPath: src/Services/Product/Product.Projection.Worker/Product.Projection.Worker.csproj
+    entryDll: Product.Projection.Worker.dll
+    kind: worker
+    readDb: CqrsDemo_Product_Read
+  - name: cart-commands
+    projectPath: src/Services/Cart/Cart.Commands.Api/Cart.Commands.Api.csproj
+    entryDll: Cart.Commands.Api.dll
+    kind: api
+    port: 8080
+    writeDb: CqrsDemo_Cart_Write
+  - name: cart-queries
+    projectPath: src/Services/Cart/Cart.Queries.Api/Cart.Queries.Api.csproj
+    entryDll: Cart.Queries.Api.dll
+    kind: api
+    port: 8080
+    readDb: CqrsDemo_Cart_Read
+  - name: cart-projection-worker
+    projectPath: src/Services/Cart/Cart.Projection.Worker/Cart.Projection.Worker.csproj
+    entryDll: Cart.Projection.Worker.dll
+    kind: worker
+    readDb: CqrsDemo_Cart_Read
+  - name: order-commands
+    projectPath: src/Services/Order/Order.Commands.Api/Order.Commands.Api.csproj
+    entryDll: Order.Commands.Api.dll
+    kind: api
+    port: 8080
+    writeDb: CqrsDemo_Order_Write
+  - name: order-queries
+    projectPath: src/Services/Order/Order.Queries.Api/Order.Queries.Api.csproj
+    entryDll: Order.Queries.Api.dll
+    kind: api
+    port: 8080
+    readDb: CqrsDemo_Order_Read
+  - name: order-projection-worker
+    projectPath: src/Services/Order/Order.Projection.Worker/Order.Projection.Worker.csproj
+    entryDll: Order.Projection.Worker.dll
+    kind: worker
+    readDb: CqrsDemo_Order_Read
+  - name: order-integration-worker
+    projectPath: src/Services/Order/Order.Integration.Worker/Order.Integration.Worker.csproj
+    entryDll: Order.Integration.Worker.dll
+    kind: worker
+    readDb: CqrsDemo_Order_Read
+  - name: payment-commands
+    projectPath: src/Services/Payment/Payment.Commands.Api/Payment.Commands.Api.csproj
+    entryDll: Payment.Commands.Api.dll
+    kind: api
+    port: 8080
+    writeDb: CqrsDemo_Payment_Write
+  - name: payment-queries
+    projectPath: src/Services/Payment/Payment.Queries.Api/Payment.Queries.Api.csproj
+    entryDll: Payment.Queries.Api.dll
+    kind: api
+    port: 8080
+    readDb: CqrsDemo_Payment_Read
+  - name: payment-projection-worker
+    projectPath: src/Services/Payment/Payment.Projection.Worker/Payment.Projection.Worker.csproj
+    entryDll: Payment.Projection.Worker.dll
+    kind: worker
+    readDb: CqrsDemo_Payment_Read
+  - name: user-commands
+    projectPath: src/Services/User/User.Commands.Api/User.Commands.Api.csproj
+    entryDll: User.Commands.Api.dll
+    kind: api
+    port: 8080
+    writeDb: CqrsDemo_User_Write
+  - name: user-queries
+    projectPath: src/Services/User/User.Queries.Api/User.Queries.Api.csproj
+    entryDll: User.Queries.Api.dll
+    kind: api
+    port: 8080
+    readDb: CqrsDemo_User_Read
+  - name: user-projection-worker
+    projectPath: src/Services/User/User.Projection.Worker/User.Projection.Worker.csproj
+    entryDll: User.Projection.Worker.dll
+    kind: worker
+    readDb: CqrsDemo_User_Read
+  - name: reporting-queries
+    projectPath: src/Services/Reporting/Reporting.Queries.Api/Reporting.Queries.Api.csproj
+    entryDll: Reporting.Queries.Api.dll
+    kind: api
+    port: 8080
+    readDb: CqrsDemo_Reporting
+  - name: reporting-projection-worker
+    projectPath: src/Services/Reporting/Reporting.Projection.Worker/Reporting.Projection.Worker.csproj
+    entryDll: Reporting.Projection.Worker.dll
+    kind: worker
+    readDb: CqrsDemo_Reporting
+  - name: checkout-saga-api
+    projectPath: src/Services/Saga/CheckoutSaga.Api/CheckoutSaga.Api.csproj
+    entryDll: CheckoutSaga.Api.dll
+    kind: api
+    port: 8080
+  - name: checkout-saga-worker
+    projectPath: src/Services/Saga/CheckoutSaga.Worker/CheckoutSaga.Worker.csproj
+    entryDll: CheckoutSaga.Worker.dll
+    kind: worker
+  - name: audit-projection-worker
+    projectPath: src/Services/Audit/Audit.Projection.Worker/Audit.Projection.Worker.csproj
+    entryDll: Audit.Projection.Worker.dll
+    kind: worker
+
+frontends:
+  - name: shop
+    appDir: shop
+    port: 3000

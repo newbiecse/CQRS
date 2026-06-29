@@ -1,0 +1,32 @@
+# Build any .NET 8 service from the distributed solution.
+# Example:
+#   docker build -f infra/dockerfiles/Dockerfile.dotnet \
+#     --build-arg PROJECT_PATH=src/Gateway/Shop.Gateway.Api/Shop.Gateway.Api.csproj \
+#     --build-arg ENTRY_DLL=Shop.Gateway.Api.dll \
+#     -t cqrsdemo/shop-gateway:latest .
+
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+COPY backend/CqrsDemo.Distributed.sln ./
+COPY backend/src/ ./src/
+COPY backend/tools/ ./tools/
+
+ARG PROJECT_PATH
+RUN test -n "$PROJECT_PATH"
+RUN dotnet restore "./${PROJECT_PATH}"
+RUN dotnet publish "./${PROJECT_PATH}" -c Release -o /app/publish /p:UseAppHost=false
+
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+WORKDIR /app
+
+ARG ENTRY_DLL
+ENV ASPNETCORE_URLS=http://+:8080
+ENV DOTNET_EnableDiagnostics=0
+ENV ENTRY_DLL=${ENTRY_DLL}
+
+COPY --from=build /app/publish .
+
+EXPOSE 8080
+
+ENTRYPOINT ["sh", "-c", "exec dotnet \"$ENTRY_DLL\""]

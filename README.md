@@ -15,7 +15,11 @@ CQRS/
 │   ├── admin/               # Admin portal (Next.js)
 │   └── shop/                # Shopping site (future)
 ├── infra/
-│   └── docker/              # SQL Server + Kafka
+│   ├── docker/              # Docker Compose (local dev)
+│   ├── dockerfiles/         # Container build definitions
+│   ├── k8s/                 # Kustomize manifests (platform infra)
+│   ├── helm/                # Helm chart (microservices)
+│   └── terraform/           # Terraform deploy to Kubernetes
 ├── docs/                    # Architecture & runbooks
 └── scripts/                 # Dev scripts & SQL
 ```
@@ -29,6 +33,8 @@ dotnet build backend/CqrsDemo.Distributed.sln
 ```
 
 See **[docs/README-DISTRIBUTED.md](docs/README-DISTRIBUTED.md)** for services, ports, and run instructions.
+
+**Kubernetes / Terraform:** see **[infra/README.md](infra/README.md)**.
 
 ## Documentation
 

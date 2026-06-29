@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: cqrs-demo
+
+resources:
+  - namespace.yaml
+  - config/secret.yaml
+  - config/configmap.yaml
+  - infra/sqlserver.yaml
+  - infra/kafka.yaml
+  - infra/elasticsearch.yaml
+  - infra/kibana.yaml
+  - infra/otel-collector-configmap.yaml
+  - infra/otel-collector.yaml
