@@ -12,3 +12,8 @@ obj/
 ## OS
 .DS_Store
 Thumbs.db
+
+## Local dev scripts
+scripts/logs/
+scripts/.backend.pids
+scripts/.backend.pids.json
