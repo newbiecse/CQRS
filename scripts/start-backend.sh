@@ -29,6 +29,7 @@ SERVICES=(
   "checkout-saga-worker|backend/src/Services/Saga/CheckoutSaga.Worker/CheckoutSaga.Worker.csproj"
   "inventory-integration|backend/src/Services/Inventory/Inventory.Integration.Worker/Inventory.Integration.Worker.csproj"
   "auth-api|backend/src/Services/Auth/Auth.Api/Auth.Api.csproj"
+  "chat-api|backend/src/Services/Chat/Chat.Api/Chat.Api.csproj"
   "product-commands|backend/src/Services/Product/Product.Commands.Api/Product.Commands.Api.csproj"
   "product-queries|backend/src/Services/Product/Product.Queries.Api/Product.Queries.Api.csproj"
   "cart-commands|backend/src/Services/Cart/Cart.Commands.Api/Cart.Commands.Api.csproj"

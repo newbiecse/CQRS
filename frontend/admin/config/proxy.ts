@@ -27,6 +27,10 @@ export default {
       target: 'http://localhost:5100',
       changeOrigin: true,
     },
+    '/api/chat': {
+      target: 'http://localhost:5100',
+      changeOrigin: true,
+    },
   },
   /**
    * @name 详细的代理配置

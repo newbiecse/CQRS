@@ -103,6 +103,13 @@ export default [
     ],
   },
   {
+    path: '/chatbot',
+    name: 'chatbot',
+    icon: 'robot',
+    component: './chatbot',
+    access: 'canAdmin',
+  },
+  {
     path: '/',
     redirect: '/catalog/products',
   },

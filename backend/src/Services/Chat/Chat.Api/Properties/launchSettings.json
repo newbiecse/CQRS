@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Chat.Api": {
+      "commandName": "Project",
+      "applicationUrl": "http://localhost:5220"
+    }
+  }
+}

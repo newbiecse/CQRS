@@ -54,4 +54,5 @@ app.MapGet("/", () => Results.Ok(new
 
 app.MapAuthEndpoints();
 app.MapAdminEndpoints();
+app.MapChatEndpoints();
 app.Run();

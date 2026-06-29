@@ -11,6 +11,7 @@ $script:BackendServices = @(
     @{ Name = "checkout-saga-worker";    Project = "backend\src\Services\Saga\CheckoutSaga.Worker\CheckoutSaga.Worker.csproj" }
     @{ Name = "inventory-integration";   Project = "backend\src\Services\Inventory\Inventory.Integration.Worker\Inventory.Integration.Worker.csproj" }
     @{ Name = "auth-api";                Project = "backend\src\Services\Auth\Auth.Api\Auth.Api.csproj" }
+    @{ Name = "chat-api";                Project = "backend\src\Services\Chat\Chat.Api\Chat.Api.csproj" }
     @{ Name = "product-commands";        Project = "backend\src\Services\Product\Product.Commands.Api\Product.Commands.Api.csproj" }
     @{ Name = "product-queries";          Project = "backend\src\Services\Product\Product.Queries.Api\Product.Queries.Api.csproj" }
     @{ Name = "cart-commands";            Project = "backend\src\Services\Cart\Cart.Commands.Api\Cart.Commands.Api.csproj" }

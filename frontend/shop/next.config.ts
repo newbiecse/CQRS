@@ -7,8 +7,12 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
-        source: "/api/:path*",
-        destination: `${gatewayUrl}/product-queries/api/:path*`,
+        source: "/api/products/:path*",
+        destination: `${gatewayUrl}/product-queries/api/products/:path*`,
+      },
+      {
+        source: "/api/chat/:path*",
+        destination: `${gatewayUrl}/chat-api/api/chat/:path*`,
       },
     ];
   },

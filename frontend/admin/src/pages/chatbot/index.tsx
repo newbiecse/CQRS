@@ -20,7 +20,7 @@ import type { ConversationItem, ParsedMessage } from './data';
 import { createChatProvider } from './service';
 import { useStyles } from './style';
 
-const WELCOME_TEXT = '🤖 你好，有什么可以帮你？';
+const WELCOME_TEXT = 'Hello! I am your CQRS Shop assistant. Ask me about products and prices.';
 
 const TypewriterTitle: React.FC = () => {
   const { styles } = useStyles();

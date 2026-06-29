@@ -11,8 +11,11 @@ Data is fetched on the server from `Shop.Gateway.Api` (`GATEWAY_URL`, default `h
 | `/` | SSR search (`?q=`) via Elasticsearch |
 | `/products` | SSR product catalog |
 | `/products/[id]` | SSR product detail + metadata |
+| `/chat` | AI shopping assistant (streaming) |
 
 Search uses a native `GET` form (no client-side fetch). Navigation triggers a new server render.
+
+Chat uses client-side streaming to `/api/chat/completions` (proxied to Chat.Api).
 
 ## Dev
 
