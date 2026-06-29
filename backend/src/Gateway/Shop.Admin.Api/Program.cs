@@ -1,3 +1,4 @@
+using Audit.Infrastructure;
 using Shop.Admin.Api.Clients;
 using Shop.Admin.Api.Endpoints;
 using Shop.Admin.Api.Options;
@@ -8,6 +9,7 @@ builder.Services.Configure<AdminShopServiceOptions>(
     builder.Configuration.GetSection(AdminShopServiceOptions.SectionName));
 builder.Services.AddHttpClient("admin-backend");
 builder.Services.AddSingleton<AdminBackendClient>();
+builder.Services.AddAuditElasticsearch(builder.Configuration);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCors(options =>

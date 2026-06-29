@@ -8,4 +8,7 @@
   <ItemGroup>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Services\Audit\Audit.Infrastructure\Audit.Infrastructure.csproj" />
+  </ItemGroup>
 </Project>

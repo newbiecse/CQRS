@@ -10,4 +10,5 @@ public static class KafkaConsumerGroups
     public const string OrderIntegration = "order-integration";
     public const string PaymentProjection = "payment-projection";
     public const string CheckoutSagaOrchestration = "checkout-saga-orchestration";
+    public const string BusinessAudit = "business-audit";
 }

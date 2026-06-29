@@ -15,6 +15,7 @@ Domain-based microservices with **Event Sourcing**, **transactional outbox**, **
 | **Order** | :5203 | :5213 | Order.Projection.Worker + **Order.Integration.Worker** |
 | **Payment** | :5204 | :5214 | Payment.Projection.Worker |
 | **Checkout Saga** | :5205 | — | **CheckoutSaga.Worker** |
+| **Audit** | — | — | **Audit.Projection.Worker** → Elasticsearch |
 | **Gateway** | :5000 (YARP) | | |
 | **Admin API** | :5100 (BFF) | | Admin portal |
 
@@ -97,8 +98,20 @@ dotnet run --project backend/src/Gateway/Shop.Admin.Api
 |---------|----------|-------------|
 | SQL Server | `localhost,1433` | `sa` / `Your_password123` |
 | Kafka | `localhost:9092` | topic `shop-events` |
+| Elasticsearch | `localhost:9200` | index `business-audit` |
 
 All `appsettings.json` files use these values.
+
+## Business audit (Elasticsearch)
+
+Integration events on `shop-events` are indexed by **`Audit.Projection.Worker`** (consumer group `business-audit`).
+
+Search via Admin API:
+
+```bash
+curl "http://localhost:5100/api/admin/audit?entityType=Product&size=20"
+curl "http://localhost:5100/api/admin/audit?q=price"
+```
 
 ## Typical flow (with User)
 

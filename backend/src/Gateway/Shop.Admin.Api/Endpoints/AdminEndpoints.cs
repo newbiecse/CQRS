@@ -1,3 +1,4 @@
+using Audit.Application.Abstractions;
 using Microsoft.Extensions.Options;
 using Shop.Admin.Api.Clients;
 using Shop.Admin.Api.Options;
@@ -66,6 +67,41 @@ internal static class AdminEndpoints
 
         group.MapPost("/sagas/checkout", (StartCheckoutSagaRequest request, AdminBackendClient client, IOptions<AdminShopServiceOptions> options, CancellationToken ct) =>
             client.PostAsync(options.Value.CheckoutSaga, "/api/sagas/checkout", request, ct));
+
+        group.MapGet("/audit", SearchAuditAsync);
+    }
+
+    private static async Task<IResult> SearchAuditAsync(
+        string? entityType,
+        string? entityId,
+        string? eventType,
+        string? q,
+        int? size,
+        IBusinessAuditReader reader,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var results = await reader.SearchAsync(
+                new BusinessAuditSearchQuery
+                {
+                    EntityType = entityType,
+                    EntityId = entityId,
+                    EventType = eventType,
+                    SearchText = q,
+                    Size = size ?? 50
+                },
+                cancellationToken);
+
+            return Results.Ok(results);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Results.Problem(
+                detail: ex.Message,
+                title: "Elasticsearch audit search failed",
+                statusCode: StatusCodes.Status503ServiceUnavailable);
+        }
     }
 
     private static async Task<IResult> GetDashboardAsync(

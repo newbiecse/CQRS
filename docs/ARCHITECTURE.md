@@ -414,7 +414,7 @@ flowchart LR
     Apps --> SBEmu
 ```
 
-Config: `infra/docker/docker-compose.yml` (SQL Server + Kafka).
+Config: `infra/docker/docker-compose.yml` (SQL Server, Kafka, Elasticsearch).
 
 ---
 
