@@ -1,8 +1,13 @@
 import type { Metadata } from "next";
+import { SiteHeader } from "@/components/SiteHeader";
+import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "CQRS Shop",
-  description: "Search products by name",
+  title: {
+    default: "CQRS Shop",
+    template: "%s | CQRS Shop",
+  },
+  description: "Customer storefront powered by Next.js server-side rendering",
 };
 
 export default function RootLayout({
@@ -11,7 +16,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-      <style>{`mark { background: #fff8c5; padding: 0 0.15em; border-radius: 2px; }`}</style>
+    <html lang="en">
+      <body>
+        <SiteHeader />
+        {children}
+      </body>
     </html>
   );
 }
