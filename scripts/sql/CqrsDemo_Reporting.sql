@@ -42,5 +42,20 @@ GO
 CREATE UNIQUE INDEX [IX_UserProfiles_Email] ON [UserProfiles] ([Email]);
 GO
 
+CREATE TABLE [OrderLineFacts] (
+    [OrderId] uniqueidentifier NOT NULL,
+    [ProductId] uniqueidentifier NOT NULL,
+    [ProductName] nvarchar(200) NOT NULL,
+    [UnitPrice] decimal(18,2) NOT NULL,
+    [Quantity] int NOT NULL,
+    [LineTotal] decimal(18,2) NOT NULL,
+    [OrderCreatedAt] datetime2 NOT NULL,
+    CONSTRAINT [PK_OrderLineFacts] PRIMARY KEY ([OrderId], [ProductId])
+);
+GO
 
+CREATE INDEX [IX_OrderLineFacts_ProductId_OrderCreatedAt] ON [OrderLineFacts] ([ProductId], [OrderCreatedAt]);
+GO
 
+CREATE INDEX [IX_OrderLineFacts_OrderCreatedAt] ON [OrderLineFacts] ([OrderCreatedAt]);
+GO

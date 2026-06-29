@@ -4,5 +4,6 @@ public enum ReportingPeriod
 {
     Day,
     Week,
-    Month
+    Month,
+    Year
 }

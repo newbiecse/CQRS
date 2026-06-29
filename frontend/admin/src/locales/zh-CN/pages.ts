@@ -93,4 +93,5 @@ export default {
   'pages.roles.create': '新建角色',
   'pages.permissions.title': '权限管理',
   'pages.permissions.create': '新建权限',
+  'pages.finance.statistics.title': '财务统计',
 };

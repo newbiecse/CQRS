@@ -88,6 +88,21 @@ export default [
     ],
   },
   {
+    path: '/finance',
+    name: 'finance',
+    icon: 'moneyCollect',
+    access: 'canAdmin',
+    routes: [
+      { path: '/finance', redirect: '/finance/statistics' },
+      {
+        path: '/finance/statistics',
+        name: 'statistics',
+        component: './finance/statistics',
+        access: 'canAdmin',
+      },
+    ],
+  },
+  {
     path: '/',
     redirect: '/catalog/products',
   },

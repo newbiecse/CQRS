@@ -13,8 +13,15 @@ public static class ReportingPeriodRange
             ReportingPeriod.Day => ForDay(reference),
             ReportingPeriod.Week => ForWeek(reference),
             ReportingPeriod.Month => ForMonth(reference),
+            ReportingPeriod.Year => ForYear(reference),
             _ => throw new ArgumentOutOfRangeException(nameof(period), period, null)
         };
+    }
+
+    private static (DateTime, DateTime) ForYear(DateTime referenceUtc)
+    {
+        var start = new DateTime(referenceUtc.Year, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        return (start, start.AddYears(1));
     }
 
     private static (DateTime, DateTime) ForDay(DateTime referenceUtc)

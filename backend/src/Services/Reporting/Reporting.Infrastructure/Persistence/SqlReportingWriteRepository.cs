@@ -85,6 +85,33 @@ public sealed class SqlReportingWriteRepository(ReportingDbContext db) : IReport
         await db.SaveChangesAsync(cancellationToken);
     }
 
+    public async Task ReplaceOrderLineFactsAsync(
+        Guid orderId,
+        IReadOnlyList<OrderLineFactInput> lines,
+        DateTime orderCreatedAt,
+        CancellationToken cancellationToken = default)
+    {
+        var existing = await db.OrderLineFacts.Where(l => l.OrderId == orderId).ToListAsync(cancellationToken);
+        if (existing.Count > 0)
+            db.OrderLineFacts.RemoveRange(existing);
+
+        foreach (var line in lines)
+        {
+            db.OrderLineFacts.Add(new OrderLineFactEntity
+            {
+                OrderId = orderId,
+                ProductId = line.ProductId,
+                ProductName = line.ProductName,
+                UnitPrice = line.UnitPrice,
+                Quantity = line.Quantity,
+                LineTotal = line.LineTotal,
+                OrderCreatedAt = orderCreatedAt
+            });
+        }
+
+        await db.SaveChangesAsync(cancellationToken);
+    }
+
     private async Task BackfillOrderFactsUserInfoAsync(
         Guid userId,
         string email,

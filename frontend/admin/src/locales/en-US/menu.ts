@@ -60,4 +60,6 @@ export default {
   'menu.identity.users': 'Users',
   'menu.identity.roles': 'Roles',
   'menu.identity.permissions': 'Permissions',
+  'menu.finance': 'Finance',
+  'menu.finance.statistics': 'Statistics',
 };

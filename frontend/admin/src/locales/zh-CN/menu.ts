@@ -60,4 +60,6 @@ export default {
   'menu.identity.users': '用户',
   'menu.identity.roles': '角色',
   'menu.identity.permissions': '权限',
+  'menu.finance': '财务',
+  'menu.finance.statistics': '统计',
 };

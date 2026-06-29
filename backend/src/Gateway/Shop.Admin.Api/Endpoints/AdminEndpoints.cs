@@ -139,11 +139,17 @@ internal static class AdminEndpoints
         group.MapPost("/carts/{cartId:guid}/checkout", (Guid cartId, AdminBackendClient client, IOptions<AdminShopServiceOptions> options, CancellationToken ct) =>
             client.PostAsync(options.Value.CartCommands, $"/api/carts/{cartId}/checkout", new { }, ct));
 
-        group.MapGet("/reports/top-users/{period}", (string period, int? limit, AdminBackendClient client, IOptions<AdminShopServiceOptions> options, CancellationToken ct) =>
-        {
-            var query = limit.HasValue ? $"?limit={limit.Value}" : string.Empty;
-            return client.GetAsync(options.Value.ReportingQueries, $"/api/reports/top-users/{period}{query}", ct);
-        });
+        group.MapGet("/reports/top-users/{period}", (string period, int? limit, DateTime? date, AdminBackendClient client, IOptions<AdminShopServiceOptions> options, CancellationToken ct) =>
+            client.GetAsync(
+                options.Value.ReportingQueries,
+                $"/api/reports/top-users/{period}{BuildReportQuery(limit, date)}",
+                ct));
+
+        group.MapGet("/reports/top-products/{period}", (string period, int? limit, DateTime? date, AdminBackendClient client, IOptions<AdminShopServiceOptions> options, CancellationToken ct) =>
+            client.GetAsync(
+                options.Value.ReportingQueries,
+                $"/api/reports/top-products/{period}{BuildReportQuery(limit, date)}",
+                ct));
 
         group.MapGet("/sagas/{sagaId:guid}", (Guid sagaId, AdminBackendClient client, IOptions<AdminShopServiceOptions> options, CancellationToken ct) =>
             client.GetAsync(options.Value.CheckoutSaga, $"/api/sagas/{sagaId}", ct));
@@ -185,6 +191,17 @@ internal static class AdminEndpoints
                 title: "Elasticsearch audit search failed",
                 statusCode: StatusCodes.Status503ServiceUnavailable);
         }
+    }
+
+    private static string BuildReportQuery(int? limit, DateTime? date)
+    {
+        var parts = new List<string>();
+        if (limit.HasValue)
+            parts.Add($"limit={limit.Value}");
+        if (date.HasValue)
+            parts.Add($"date={Uri.EscapeDataString(date.Value.ToString("O"))}");
+
+        return parts.Count == 0 ? string.Empty : "?" + string.Join('&', parts);
     }
 
     private static async Task<IResult> GetDashboardAsync(

@@ -65,6 +65,15 @@ public sealed class ReportingProjectionHandler(IReportingWriteRepository reposit
             status: "PendingPayment",
             e.CreatedAt,
             cancellationToken);
+
+        var lines = e.Lines.Select(line => new OrderLineFactInput(
+            line.ProductId,
+            line.ProductName,
+            line.UnitPrice,
+            line.Quantity,
+            line.LineTotal)).ToList();
+
+        await repository.ReplaceOrderLineFactsAsync(e.OrderId, lines, e.CreatedAt, cancellationToken);
     }
 
     private async Task ProjectOrderPaidAsync(string payload, CancellationToken cancellationToken)

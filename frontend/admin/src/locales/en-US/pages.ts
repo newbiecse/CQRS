@@ -98,4 +98,5 @@ export default {
   'pages.roles.create': 'New role',
   'pages.permissions.title': 'Permissions',
   'pages.permissions.create': 'New permission',
+  'pages.finance.statistics.title': 'Finance statistics',
 };

@@ -6,6 +6,7 @@ public sealed class ReportingDbContext(DbContextOptions<ReportingDbContext> opti
 {
     public DbSet<UserProfileReportEntity> UserProfiles => Set<UserProfileReportEntity>();
     public DbSet<OrderReportFactEntity> OrderFacts => Set<OrderReportFactEntity>();
+    public DbSet<OrderLineFactEntity> OrderLineFacts => Set<OrderLineFactEntity>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -29,6 +30,17 @@ public sealed class ReportingDbContext(DbContextOptions<ReportingDbContext> opti
             entity.HasIndex(o => new { o.UserId, o.OrderCreatedAt });
             entity.HasIndex(o => o.OrderCreatedAt);
         });
+
+        modelBuilder.Entity<OrderLineFactEntity>(entity =>
+        {
+            entity.ToTable("OrderLineFacts");
+            entity.HasKey(l => new { l.OrderId, l.ProductId });
+            entity.Property(l => l.ProductName).HasMaxLength(200).IsRequired();
+            entity.Property(l => l.UnitPrice).HasPrecision(18, 2);
+            entity.Property(l => l.LineTotal).HasPrecision(18, 2);
+            entity.HasIndex(l => new { l.ProductId, l.OrderCreatedAt });
+            entity.HasIndex(l => l.OrderCreatedAt);
+        });
     }
 }
 
@@ -51,4 +63,15 @@ public sealed class OrderReportFactEntity
     public string Status { get; set; } = string.Empty;
     public DateTime OrderCreatedAt { get; set; }
     public DateTime LastUpdatedAt { get; set; }
+}
+
+public sealed class OrderLineFactEntity
+{
+    public Guid OrderId { get; set; }
+    public Guid ProductId { get; set; }
+    public string ProductName { get; set; } = string.Empty;
+    public decimal UnitPrice { get; set; }
+    public int Quantity { get; set; }
+    public decimal LineTotal { get; set; }
+    public DateTime OrderCreatedAt { get; set; }
 }

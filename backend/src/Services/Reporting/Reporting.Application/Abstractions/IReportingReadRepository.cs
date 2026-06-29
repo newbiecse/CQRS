@@ -10,4 +10,11 @@ public interface IReportingReadRepository
         DateTime periodStartUtc,
         DateTime periodEndUtc,
         CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<TopProductBySalesReadModel>> GetTopProductsBySalesAsync(
+        ReportingPeriod period,
+        int limit,
+        DateTime periodStartUtc,
+        DateTime periodEndUtc,
+        CancellationToken cancellationToken = default);
 }

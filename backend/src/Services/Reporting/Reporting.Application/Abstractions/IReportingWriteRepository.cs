@@ -27,4 +27,17 @@ public interface IReportingWriteRepository
         CancellationToken cancellationToken = default);
 
     Task DeactivateUserProfileAsync(Guid userId, DateTime deactivatedAt, CancellationToken cancellationToken = default);
+
+    Task ReplaceOrderLineFactsAsync(
+        Guid orderId,
+        IReadOnlyList<OrderLineFactInput> lines,
+        DateTime orderCreatedAt,
+        CancellationToken cancellationToken = default);
 }
+
+public sealed record OrderLineFactInput(
+    Guid ProductId,
+    string ProductName,
+    decimal UnitPrice,
+    int Quantity,
+    decimal LineTotal);
