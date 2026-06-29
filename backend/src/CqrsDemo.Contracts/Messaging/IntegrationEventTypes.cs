@@ -8,6 +8,8 @@ public static class IntegrationEventTypes
 
     public const string ProductCreated = "product.created.v1";
     public const string ProductPriceUpdated = "product.price-updated.v1";
+    public const string ProductUpdated = "product.updated.v1";
+    public const string ProductDeleted = "product.deleted.v1";
 
     public const string CartCreated = "cart.created.v1";
     public const string CartItemAdded = "cart.item-added.v1";

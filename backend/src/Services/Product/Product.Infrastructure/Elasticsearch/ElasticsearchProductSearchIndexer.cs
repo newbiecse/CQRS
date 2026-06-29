@@ -33,4 +33,17 @@ public sealed class ElasticsearchProductSearchIndexer(
                 response.ElasticsearchServerError?.Error.Reason ?? response.DebugInformation);
         }
     }
+
+    public async Task DeleteAsync(Guid productId, CancellationToken cancellationToken = default)
+    {
+        var indexName = options.Value.ProductIndex;
+        var response = await client.DeleteAsync(indexName, Id.From(productId), cancellationToken);
+        if (!response.IsValidResponse)
+        {
+            logger.LogWarning(
+                "Failed to delete product {ProductId} from index: {Error}",
+                productId,
+                response.ElasticsearchServerError?.Error.Reason ?? response.DebugInformation);
+        }
+    }
 }

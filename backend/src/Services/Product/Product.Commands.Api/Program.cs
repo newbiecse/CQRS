@@ -2,6 +2,8 @@ using CqrsDemo.BuildingBlocks.Observability;
 using MediatR;
 using Product.Application;
 using Product.Application.Commands.CreateProduct;
+using Product.Application.Commands.DeleteProduct;
+using Product.Application.Commands.UpdateProduct;
 using Product.Application.Commands.UpdateProductPrice;
 using Product.Infrastructure;
 
@@ -35,6 +37,28 @@ app.MapPut("/api/products/{id:guid}/price", async (Guid id, UpdatePriceRequest r
     catch (KeyNotFoundException ex) { return Results.NotFound(new { message = ex.Message }); }
 });
 
+app.MapPut("/api/products/{id:guid}", async (Guid id, UpdateProductRequest r, IMediator m) =>
+{
+    try
+    {
+        await m.Send(new UpdateProductCommand(id, r.Name, r.Price));
+        return Results.Accepted($"/api/products/{id}", new { id });
+    }
+    catch (KeyNotFoundException ex) { return Results.NotFound(new { message = ex.Message }); }
+    catch (ArgumentException ex) { return Results.BadRequest(new { message = ex.Message }); }
+});
+
+app.MapDelete("/api/products/{id:guid}", async (Guid id, IMediator m) =>
+{
+    try
+    {
+        await m.Send(new DeleteProductCommand(id));
+        return Results.NoContent();
+    }
+    catch (KeyNotFoundException ex) { return Results.NotFound(new { message = ex.Message }); }
+});
+
 app.Run();
 internal sealed record CreateProductRequest(string Name, decimal Price);
 internal sealed record UpdatePriceRequest(decimal NewPrice);
+internal sealed record UpdateProductRequest(string Name, decimal Price);

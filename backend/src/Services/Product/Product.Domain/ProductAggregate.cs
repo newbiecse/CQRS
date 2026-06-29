@@ -43,4 +43,22 @@ public sealed class ProductAggregate : AggregateRoot
         Price = newPrice;
         RaiseDomainEvent(new ProductPriceUpdatedEvent(Id, oldPrice, newPrice, DateTime.UtcNow));
     }
+
+    public void UpdateDetails(string name, decimal price)
+    {
+        if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Name required.");
+        if (price < 0) throw new ArgumentException("Price invalid.");
+
+        var trimmedName = name.Trim();
+        if (trimmedName == Name && price == Price) return;
+
+        Name = trimmedName;
+        Price = price;
+        RaiseDomainEvent(new ProductUpdatedEvent(Id, Name, Price, DateTime.UtcNow));
+    }
+
+    public void Delete()
+    {
+        RaiseDomainEvent(new ProductDeletedEvent(Id, DateTime.UtcNow));
+    }
 }

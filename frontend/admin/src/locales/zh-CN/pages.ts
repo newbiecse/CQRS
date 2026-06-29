@@ -78,4 +78,8 @@ export default {
   'pages.searchTable.tenThousand': '万',
   'pages.searchTable.batchDeletion': '批量删除',
   'pages.searchTable.batchApproval': '批量审批',
+  'pages.products.title': '商品管理',
+  'pages.products.create': '新建商品',
+  'pages.products.detail': '商品详情',
+  'pages.products.auditTab': '审计历史',
 };

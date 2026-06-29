@@ -26,6 +26,9 @@ public sealed class AdminBackendClient(IHttpClientFactory httpClientFactory)
         CancellationToken cancellationToken) =>
         SendAsync(HttpMethod.Put, baseUrl, path, body, cancellationToken);
 
+    public Task<IResult> DeleteAsync(string baseUrl, string path, CancellationToken cancellationToken) =>
+        SendAsync<object?>(HttpMethod.Delete, baseUrl, path, null, cancellationToken);
+
     public async Task<T?> ReadJsonAsync<T>(string baseUrl, string path, CancellationToken cancellationToken)
     {
         var response = await Http.GetAsync(Combine(baseUrl, path), cancellationToken);

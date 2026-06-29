@@ -11,3 +11,13 @@ public sealed record ProductPriceUpdatedEvent(Guid ProductId, decimal OldPrice, 
 {
     public DateTime OccurredOn { get; } = DateTime.UtcNow;
 }
+
+public sealed record ProductUpdatedEvent(Guid ProductId, string Name, decimal Price, DateTime UpdatedAt) : IDomainEvent
+{
+    public DateTime OccurredOn { get; } = DateTime.UtcNow;
+}
+
+public sealed record ProductDeletedEvent(Guid ProductId, DateTime DeletedAt) : IDomainEvent
+{
+    public DateTime OccurredOn { get; } = DateTime.UtcNow;
+}

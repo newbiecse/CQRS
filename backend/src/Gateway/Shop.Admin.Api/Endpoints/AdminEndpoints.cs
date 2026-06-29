@@ -26,6 +26,12 @@ internal static class AdminEndpoints
         group.MapPut("/products/{id:guid}/price", (Guid id, UpdatePriceRequest request, AdminBackendClient client, IOptions<AdminShopServiceOptions> options, CancellationToken ct) =>
             client.PutAsync(options.Value.ProductCommands, $"/api/products/{id}/price", request, ct));
 
+        group.MapPut("/products/{id:guid}", (Guid id, UpdateProductRequest request, AdminBackendClient client, IOptions<AdminShopServiceOptions> options, CancellationToken ct) =>
+            client.PutAsync(options.Value.ProductCommands, $"/api/products/{id}", request, ct));
+
+        group.MapDelete("/products/{id:guid}", (Guid id, AdminBackendClient client, IOptions<AdminShopServiceOptions> options, CancellationToken ct) =>
+            client.DeleteAsync(options.Value.ProductCommands, $"/api/products/{id}", ct));
+
         group.MapGet("/users", (AdminBackendClient client, IOptions<AdminShopServiceOptions> options, CancellationToken ct) =>
             client.GetAsync(options.Value.UserQueries, "/api/users", ct));
 
@@ -140,6 +146,7 @@ internal static class AdminEndpoints
 }
 
 internal sealed record CreateProductRequest(string Name, decimal Price);
+internal sealed record UpdateProductRequest(string Name, decimal Price);
 internal sealed record UpdatePriceRequest(decimal NewPrice);
 internal sealed record RegisterUserRequest(string Email, string DisplayName);
 internal sealed record CancelOrderRequest(string Reason);

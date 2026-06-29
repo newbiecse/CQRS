@@ -50,4 +50,7 @@ export default {
   'menu.editor.mind': '脑图编辑器',
   'menu.editor.koni': '拓扑编辑器',
   'menu.chatbot': 'AI 助手',
+  'menu.catalog': '商品目录',
+  'menu.catalog.products': '商品管理',
+  'menu.catalog.product-detail': '商品详情',
 };

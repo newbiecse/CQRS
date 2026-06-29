@@ -15,6 +15,14 @@ public sealed class SqlProductReadRepository(ProductReadDbContext db) : IProduct
         await db.SaveChangesAsync(ct);
     }
 
+    public async Task DeleteAsync(Guid id, CancellationToken ct = default)
+    {
+        var entity = await db.Products.FindAsync([id], ct);
+        if (entity is null) return;
+        db.Products.Remove(entity);
+        await db.SaveChangesAsync(ct);
+    }
+
     public async Task<ProductReadModel?> GetByIdAsync(Guid id, CancellationToken ct = default)
     {
         var e = await db.Products.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id, ct);

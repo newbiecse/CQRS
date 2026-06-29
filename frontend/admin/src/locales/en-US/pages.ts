@@ -83,4 +83,8 @@ export default {
   'pages.searchTable.tenThousand': '0000',
   'pages.searchTable.batchDeletion': 'batch deletion',
   'pages.searchTable.batchApproval': 'batch approval',
+  'pages.products.title': 'Products',
+  'pages.products.create': 'New product',
+  'pages.products.detail': 'Product detail',
+  'pages.products.auditTab': 'Audit history',
 };

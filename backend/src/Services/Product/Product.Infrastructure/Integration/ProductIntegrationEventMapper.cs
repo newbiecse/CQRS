@@ -18,6 +18,10 @@ public sealed class ProductIntegrationEventMapper : IIntegrationEventMapper
             IntegrationEventSerializer.Serialize(new ProductCreatedIntegrationEvent(c.ProductId, c.Name, c.Price, c.CreatedAt))),
         ProductPriceUpdatedEvent u => new(IntegrationEventTypes.ProductPriceUpdated,
             IntegrationEventSerializer.Serialize(new ProductPriceUpdatedIntegrationEvent(u.ProductId, u.OldPrice, u.NewPrice, u.UpdatedAt))),
+        ProductUpdatedEvent u => new(IntegrationEventTypes.ProductUpdated,
+            IntegrationEventSerializer.Serialize(new ProductUpdatedIntegrationEvent(u.ProductId, u.Name, u.Price, u.UpdatedAt))),
+        ProductDeletedEvent d => new(IntegrationEventTypes.ProductDeleted,
+            IntegrationEventSerializer.Serialize(new ProductDeletedIntegrationEvent(d.ProductId, d.DeletedAt))),
         _ => throw new NotSupportedException(e.GetType().Name)
     };
 }
