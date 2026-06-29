@@ -82,4 +82,9 @@ export default {
   'pages.products.create': '新建商品',
   'pages.products.detail': '商品详情',
   'pages.products.auditTab': '审计历史',
+  'pages.products.stock': '可用库存',
+  'pages.products.onHand': '在手库存',
+  'pages.orders.title': '订单管理',
+  'pages.orders.create': '新建订单',
+  'pages.orders.detail': '订单详情',
 };

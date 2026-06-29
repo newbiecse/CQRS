@@ -4,7 +4,9 @@ using Order.Domain;
 
 namespace Order.Application.Commands.MarkOrderPaid;
 
-public sealed class MarkOrderPaidCommandHandler(IOrderWriteRepository repository)
+public sealed class MarkOrderPaidCommandHandler(
+    IOrderWriteRepository repository,
+    IInventoryCommandClient inventoryClient)
     : IRequestHandler<MarkOrderPaidCommand>
 {
     public async Task Handle(MarkOrderPaidCommand request, CancellationToken cancellationToken)
@@ -14,5 +16,6 @@ public sealed class MarkOrderPaidCommandHandler(IOrderWriteRepository repository
 
         order.MarkAsPaid(request.PaymentId, request.Amount);
         await repository.UpdateAsync(order, cancellationToken);
+        await inventoryClient.ConfirmAsync(request.OrderId, cancellationToken);
     }
 }

@@ -23,6 +23,10 @@ public sealed class OrderIntegrationEventMapper : IIntegrationEventMapper
             IntegrationEventTypes.OrderPaid,
             IntegrationEventSerializer.Serialize(new OrderPaidIntegrationEvent(
                 e.OrderId, e.PaymentId, e.Amount, e.PaidAt))),
+        OrderUpdatedEvent e => new(
+            IntegrationEventTypes.OrderUpdated,
+            IntegrationEventSerializer.Serialize(new OrderUpdatedIntegrationEvent(
+                e.OrderId, e.CustomerId, e.CartId, e.Lines.Select(ToDto).ToList(), e.TotalAmount, e.UpdatedAt))),
         OrderCancelledEvent e => new(
             IntegrationEventTypes.OrderCancelled,
             IntegrationEventSerializer.Serialize(new OrderCancelledIntegrationEvent(

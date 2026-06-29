@@ -38,6 +38,25 @@ export default [
     ],
   },
   {
+    path: '/orders',
+    name: 'orders',
+    icon: 'shopping',
+    routes: [
+      { path: '/orders', redirect: '/orders/list' },
+      {
+        path: '/orders/list',
+        name: 'order-list',
+        component: './orders',
+      },
+      {
+        path: '/orders/:id',
+        name: 'order-detail',
+        component: './orders/detail',
+        hideInMenu: true,
+      },
+    ],
+  },
+  {
     path: '/',
     redirect: '/catalog/products',
   },

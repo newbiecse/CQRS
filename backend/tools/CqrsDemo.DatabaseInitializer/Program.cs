@@ -1,6 +1,7 @@
 using Cart.Infrastructure.Persistence.Read;
 using Cart.Infrastructure.Persistence.Write;
 using CheckoutSaga.Infrastructure.Persistence;
+using Inventory.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Order.Infrastructure.Persistence.Read;
 using Order.Infrastructure.Persistence.Write;
@@ -44,6 +45,7 @@ var targets = new (string Database, Func<string, DbContext> CreateContext)[]
 
     ("CqrsDemo_Saga", conn => Create<CheckoutSagaDbContext>(conn)),
     ("CqrsDemo_Reporting", conn => Create<ReportingDbContext>(conn)),
+    ("CqrsDemo_Inventory", conn => Create<InventoryDbContext>(conn)),
 };
 
 foreach (var (database, createContext) in targets)

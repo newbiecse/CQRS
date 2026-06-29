@@ -6,7 +6,9 @@ using Order.Domain;
 
 namespace Order.Application.Integration;
 
-public sealed class OrderIntegrationHandlers(IOrderWriteRepository repository)
+public sealed class OrderIntegrationHandlers(
+    IOrderWriteRepository repository,
+    IInventoryCommandClient inventoryClient)
 {
     public async Task HandleCartCheckedOutAsync(string payload, CancellationToken cancellationToken)
     {
@@ -21,7 +23,18 @@ public sealed class OrderIntegrationHandlers(IOrderWriteRepository repository)
             Quantity = l.Quantity
         }).ToList();
 
-        var order = OrderAggregate.Create(e.OrderId, e.CustomerId, e.CartId, lines);
-        await repository.AddAsync(order, cancellationToken);
+        var stockLines = lines.Select(l => new InventoryStockLine(l.ProductId, l.Quantity)).ToList();
+        await inventoryClient.ReserveAsync(e.OrderId, stockLines, cancellationToken);
+
+        try
+        {
+            var order = OrderAggregate.Create(e.OrderId, e.CustomerId, e.CartId, lines);
+            await repository.AddAsync(order, cancellationToken);
+        }
+        catch
+        {
+            await inventoryClient.ReleaseAsync(e.OrderId, cancellationToken);
+            throw;
+        }
     }
 }

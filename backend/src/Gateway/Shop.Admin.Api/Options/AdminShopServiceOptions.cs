@@ -12,6 +12,8 @@ public sealed class AdminShopServiceOptions
     public string CartQueries { get; set; } = "http://localhost:5212";
     public string OrderCommands { get; set; } = "http://localhost:5203";
     public string OrderQueries { get; set; } = "http://localhost:5213";
+    public string InventoryCommands { get; set; } = "http://localhost:5208";
+    public string InventoryQueries { get; set; } = "http://localhost:5218";
     public string ReportingQueries { get; set; } = "http://localhost:5217";
     public string CheckoutSaga { get; set; } = "http://localhost:5205";
 }

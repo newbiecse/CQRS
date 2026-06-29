@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Order.Application.Abstractions;
 using Order.Application.Integration;
+using Order.Infrastructure.Http;
 using Order.Infrastructure.Integration;
 using Order.Infrastructure.Persistence.Read;
 using Order.Infrastructure.Persistence.Write;
@@ -20,6 +21,7 @@ public static class DependencyInjection
         services.AddScoped<IIntegrationEventMapper, OrderIntegrationEventMapper>();
         services.AddScoped<IOrderWriteRepository, SqlOrderWriteRepository>();
         services.AddScoped<OrderIntegrationHandlers>();
+        services.AddInventoryCommandClient(configuration);
         return services;
     }
 

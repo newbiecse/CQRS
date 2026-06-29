@@ -16,6 +16,9 @@ public sealed class OrderProjectionHandler(IOrderReadRepository repository, ILog
             case IntegrationEventTypes.OrderCreated:
                 await ProjectOrderCreatedAsync(payload, cancellationToken);
                 break;
+            case IntegrationEventTypes.OrderUpdated:
+                await ProjectOrderUpdatedAsync(payload, cancellationToken);
+                break;
             case IntegrationEventTypes.OrderPaid:
                 await ProjectOrderPaidAsync(payload, cancellationToken);
                 break;
@@ -41,6 +44,25 @@ public sealed class OrderProjectionHandler(IOrderReadRepository repository, ILog
             TotalAmount = e.TotalAmount,
             CreatedAt = e.CreatedAt,
             LastUpdatedAt = e.CreatedAt
+        }, cancellationToken);
+    }
+
+    private async Task ProjectOrderUpdatedAsync(string payload, CancellationToken cancellationToken)
+    {
+        var e = IntegrationEventSerializer.Deserialize<OrderUpdatedIntegrationEvent>(payload);
+        var order = await repository.GetByIdAsync(e.OrderId, cancellationToken);
+
+        await repository.UpsertAsync(new OrderReadModel
+        {
+            Id = e.OrderId,
+            CustomerId = e.CustomerId,
+            CartId = e.CartId,
+            Status = order?.Status ?? "PendingPayment",
+            Lines = e.Lines,
+            TotalAmount = e.TotalAmount,
+            PaymentId = order?.PaymentId,
+            CreatedAt = order?.CreatedAt ?? e.UpdatedAt,
+            LastUpdatedAt = e.UpdatedAt
         }, cancellationToken);
     }
 

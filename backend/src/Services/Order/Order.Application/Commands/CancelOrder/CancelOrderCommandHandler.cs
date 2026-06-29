@@ -4,7 +4,9 @@ using Order.Domain;
 
 namespace Order.Application.Commands.CancelOrder;
 
-public sealed class CancelOrderCommandHandler(IOrderWriteRepository repository)
+public sealed class CancelOrderCommandHandler(
+    IOrderWriteRepository repository,
+    IInventoryCommandClient inventoryClient)
     : IRequestHandler<CancelOrderCommand>
 {
     public async Task Handle(CancelOrderCommand request, CancellationToken cancellationToken)
@@ -14,5 +16,6 @@ public sealed class CancelOrderCommandHandler(IOrderWriteRepository repository)
 
         order.Cancel(request.Reason);
         await repository.UpdateAsync(order, cancellationToken);
+        await inventoryClient.ReleaseAsync(request.OrderId, cancellationToken);
     }
 }

@@ -17,6 +17,7 @@ public static class IntegrationEventTypes
     public const string CartCheckedOut = "cart.checked-out.v1";
 
     public const string OrderCreated = "order.created.v1";
+    public const string OrderUpdated = "order.updated.v1";
     public const string OrderPaid = "order.paid.v1";
     public const string OrderCancelled = "order.cancelled.v1";
 

@@ -53,4 +53,7 @@ export default {
   'menu.catalog': 'Catalog',
   'menu.catalog.products': 'Products',
   'menu.catalog.product-detail': 'Product detail',
+  'menu.orders': 'Orders',
+  'menu.orders.order-list': 'Order list',
+  'menu.orders.order-detail': 'Order detail',
 };

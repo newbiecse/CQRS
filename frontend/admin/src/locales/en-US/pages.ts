@@ -87,4 +87,9 @@ export default {
   'pages.products.create': 'New product',
   'pages.products.detail': 'Product detail',
   'pages.products.auditTab': 'Audit history',
+  'pages.products.stock': 'Available stock',
+  'pages.products.onHand': 'On hand',
+  'pages.orders.title': 'Orders',
+  'pages.orders.create': 'New order',
+  'pages.orders.detail': 'Order detail',
 };

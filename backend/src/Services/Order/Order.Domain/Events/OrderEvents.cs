@@ -21,3 +21,14 @@ public sealed record OrderPaidEvent(
 {
     public DateTime OccurredOn { get; } = DateTime.UtcNow;
 }
+
+public sealed record OrderUpdatedEvent(
+    Guid OrderId,
+    Guid CustomerId,
+    Guid CartId,
+    IReadOnlyList<OrderLine> Lines,
+    decimal TotalAmount,
+    DateTime UpdatedAt) : IDomainEvent
+{
+    public DateTime OccurredOn { get; } = DateTime.UtcNow;
+}

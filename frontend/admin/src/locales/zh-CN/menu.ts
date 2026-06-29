@@ -53,4 +53,7 @@ export default {
   'menu.catalog': '商品目录',
   'menu.catalog.products': '商品管理',
   'menu.catalog.product-detail': '商品详情',
+  'menu.orders': '订单',
+  'menu.orders.order-list': '订单列表',
+  'menu.orders.order-detail': '订单详情',
 };

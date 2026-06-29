@@ -1,10 +1,10 @@
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ModalForm, PageContainer, ProFormDigit, ProFormText, ProTable } from '@ant-design/pro-components';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { FormattedMessage, history, useIntl } from '@umijs/max';
 import { Button, message, Popconfirm, Space } from 'antd';
-import React, { useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import type { ProductItem } from './data.d';
 import {
   createProduct,
@@ -12,8 +12,9 @@ import {
   queryProducts,
   updateProduct,
 } from './service';
+import { adjustInventory, queryInventory } from '../../orders/service';
 
-const ProductFormFields: React.FC = () => (
+const ProductFormFields: React.FC<{ showStock?: boolean }> = ({ showStock }) => (
   <>
     <ProFormText
       name="name"
@@ -27,6 +28,15 @@ const ProductFormFields: React.FC = () => (
       fieldProps={{ precision: 2 }}
       rules={[{ required: true, message: 'Price is required' }]}
     />
+    {showStock && (
+      <ProFormDigit
+        name="onHand"
+        label="On hand"
+        min={0}
+        fieldProps={{ precision: 0 }}
+        rules={[{ required: true, message: 'Stock quantity is required' }]}
+      />
+    )}
   </>
 );
 
@@ -39,9 +49,20 @@ const ProductListPage: React.FC = () => {
   const [editOpen, setEditOpen] = useState(false);
   const [editing, setEditing] = useState<ProductItem | null>(null);
 
+  const { data: inventory = [] } = useQuery({
+    queryKey: ['admin-inventory'],
+    queryFn: queryInventory,
+  });
+
+  const stockByProduct = useMemo(
+    () => new Map(inventory.map((item) => [item.productId, item])),
+    [inventory],
+  );
+
   const invalidate = () => {
     actionRef.current?.reload();
     queryClient.invalidateQueries({ queryKey: ['admin-products'] });
+    queryClient.invalidateQueries({ queryKey: ['admin-inventory'] });
   };
 
   const createMutation = useMutation({
@@ -89,6 +110,13 @@ const ProductListPage: React.FC = () => {
           {record.name}
         </Button>
       ),
+    },
+    {
+      title: 'Available',
+      dataIndex: 'id',
+      search: false,
+      width: 100,
+      render: (_, record) => stockByProduct.get(record.id)?.available ?? '—',
     },
     {
       title: 'Price',
@@ -187,18 +215,29 @@ const ProductListPage: React.FC = () => {
           setEditOpen(open);
           if (!open) setEditing(null);
         }}
-        initialValues={editing ?? undefined}
+        initialValues={
+          editing
+            ? {
+                ...editing,
+                onHand: stockByProduct.get(editing.id)?.onHand ?? 0,
+              }
+            : undefined
+        }
         onFinish={async (values) => {
           if (!editing) return false;
           await updateMutation.mutateAsync({
             id: editing.id,
-            body: values as { name: string; price: number },
+            body: { name: values.name, price: values.price },
           });
+          if (typeof values.onHand === 'number') {
+            await adjustInventory(editing.id, values.onHand);
+          }
+          invalidate();
           return true;
         }}
         modalProps={{ destroyOnClose: true }}
       >
-        <ProductFormFields />
+        <ProductFormFields showStock />
       </ModalForm>
     </PageContainer>
   );

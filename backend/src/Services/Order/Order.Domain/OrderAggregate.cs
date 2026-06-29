@@ -79,4 +79,17 @@ public sealed class OrderAggregate : AggregateRoot
         Status = OrderStatus.Cancelled;
         RaiseDomainEvent(new OrderCancelledEvent(Id, CartId, reason, DateTime.UtcNow));
     }
+
+    public void UpdateLines(IReadOnlyList<OrderLine> lines)
+    {
+        if (Status != OrderStatus.PendingPayment)
+            throw new InvalidOperationException("Only pending orders can be updated.");
+        if (lines.Count == 0)
+            throw new ArgumentException("Order must contain at least one line.", nameof(lines));
+
+        _lines.Clear();
+        _lines.AddRange(lines);
+        TotalAmount = lines.Sum(l => l.LineTotal);
+        RaiseDomainEvent(new OrderUpdatedEvent(Id, CustomerId, CartId, lines.ToList(), TotalAmount, DateTime.UtcNow));
+    }
 }
