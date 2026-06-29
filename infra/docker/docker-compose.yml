@@ -82,6 +82,38 @@ services:
       retries: 10
       start_period: 45s
 
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.15.0
+    container_name: cqrs-demo-kibana
+    hostname: kibana
+    ports:
+      - "5601:5601"
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+    networks:
+      - cqrs-network
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    restart: unless-stopped
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.111.0
+    container_name: cqrs-demo-otel-collector
+    hostname: otel-collector
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml:ro
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+    networks:
+      - cqrs-network
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    restart: unless-stopped
+
 networks:
   cqrs-network:
     driver: bridge

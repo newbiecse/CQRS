@@ -1,9 +1,11 @@
+using CqrsDemo.BuildingBlocks.Observability;
 using CqrsDemo.BuildingBlocks.Messaging;
 using CqrsDemo.Contracts.Messaging;
 using Payment.Infrastructure;
 using Payment.Projection.Worker.Consumers;
 
 var builder = Host.CreateApplicationBuilder(args);
+builder.AddPlatformObservability("payment-projection-worker");
 builder.Services.AddPaymentReadInfrastructure(builder.Configuration);
 builder.Services.AddKafkaConsumer<PaymentProjectionConsumer>(
     builder.Configuration,

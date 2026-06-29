@@ -8,4 +8,7 @@
     <PackageReference Include="Yarp.ReverseProxy" Version="2.2.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\BuildingBlocks\CqrsDemo.BuildingBlocks.Observability\CqrsDemo.BuildingBlocks.Observability.csproj" />
+  </ItemGroup>
 </Project>

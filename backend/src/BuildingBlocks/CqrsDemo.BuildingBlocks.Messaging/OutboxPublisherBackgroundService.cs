@@ -41,7 +41,9 @@ public sealed class OutboxPublisherBackgroundService(
         {
             try
             {
-                await publisher.PublishAsync(new IntegrationEventEnvelope(m.EventType, m.Payload), ct);
+                await publisher.PublishAsync(
+                    new IntegrationEventEnvelope(m.EventType, m.Payload, m.CorrelationId, m.TraceId).WithCorrelation(),
+                    ct);
                 m.ProcessedAt = DateTime.UtcNow;
                 m.LastError = null;
             }

@@ -1,3 +1,4 @@
+using CqrsDemo.BuildingBlocks.Observability;
 using MediatR;
 using Product.Application;
 using Product.Application.Queries.GetAllProducts;
@@ -5,12 +6,14 @@ using Product.Application.Queries.GetProductById;
 using Product.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.AddPlatformObservability("product-queries");
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddProductApplication();
 builder.Services.AddProductReadInfrastructure(builder.Configuration);
 
 var app = builder.Build();
+app.UsePlatformObservability();
 await app.Services.InitializeProductReadStoreAsync();
 if (app.Environment.IsDevelopment()) { app.UseSwagger(); app.UseSwaggerUI(); }
 

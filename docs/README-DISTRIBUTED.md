@@ -98,9 +98,21 @@ dotnet run --project backend/src/Gateway/Shop.Admin.Api
 |---------|----------|-------------|
 | SQL Server | `localhost,1433` | `sa` / `Your_password123` |
 | Kafka | `localhost:9092` | topic `shop-events` |
-| Elasticsearch | `localhost:9200` | index `business-audit` |
+| Elasticsearch | `localhost:9200` | index `business-audit` (audit), `app-logs-*` (operational logs) |
+| Kibana | `http://localhost:5601` | browse logs & audit indices |
+| OpenTelemetry Collector | `localhost:4317` (gRPC), `4318` (HTTP) | traces + OTLP logs → Elasticsearch |
 
 All `appsettings.json` files use these values.
+
+## Distributed logging (operational)
+
+All APIs and workers use **`CqrsDemo.BuildingBlocks.Observability`**:
+
+- **Serilog** structured JSON → console + Elasticsearch (`app-logs-{date}`)
+- **Correlation ID** (`X-Correlation-Id`) on HTTP and Kafka integration events
+- **OpenTelemetry** traces/logs → OTLP collector → Elasticsearch (`app-traces`, `app-logs-otel`)
+
+View logs in **Kibana** (`http://localhost:5601`) — filter by `service.name` or `CorrelationId`.
 
 ## Business audit (Elasticsearch)
 

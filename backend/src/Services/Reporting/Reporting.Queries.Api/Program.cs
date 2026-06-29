@@ -1,14 +1,17 @@
+using CqrsDemo.BuildingBlocks.Observability;
 using Reporting.Application;
 using Reporting.Infrastructure;
 using Reporting.Queries.Api;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.AddPlatformObservability("reporting-queries");
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddReportingApplication();
 builder.Services.AddReportingInfrastructure(builder.Configuration);
 
 var app = builder.Build();
+app.UsePlatformObservability();
 await app.Services.InitializeReportingStoreAsync();
 
 if (app.Environment.IsDevelopment())

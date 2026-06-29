@@ -1,15 +1,18 @@
+using CqrsDemo.BuildingBlocks.Observability;
 using Cart.Application;
 using Cart.Application.Queries.GetCartById;
 using Cart.Infrastructure;
 using MediatR;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.AddPlatformObservability("cart-queries");
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCartApplication();
 builder.Services.AddCartReadInfrastructure(builder.Configuration);
 
 var app = builder.Build();
+app.UsePlatformObservability();
 await app.Services.InitializeCartReadStoreAsync();
 
 if (app.Environment.IsDevelopment())

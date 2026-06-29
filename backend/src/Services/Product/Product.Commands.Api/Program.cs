@@ -1,3 +1,4 @@
+using CqrsDemo.BuildingBlocks.Observability;
 using MediatR;
 using Product.Application;
 using Product.Application.Commands.CreateProduct;
@@ -5,6 +6,7 @@ using Product.Application.Commands.UpdateProductPrice;
 using Product.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.AddPlatformObservability("product-commands");
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddProductApplication();
@@ -12,6 +14,7 @@ builder.Services.AddProductWriteInfrastructure(builder.Configuration);
 
 var app = builder.Build();
 await app.Services.InitializeProductWriteStoreAsync();
+app.UsePlatformObservability();
 if (app.Environment.IsDevelopment()) { app.UseSwagger(); app.UseSwaggerUI(); }
 
 app.MapGet("/", () => Results.Ok(new { service = "Product.Commands.Api", port = 5201 }));

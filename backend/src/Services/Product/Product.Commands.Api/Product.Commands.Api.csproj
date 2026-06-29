@@ -10,5 +10,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Product.Application\Product.Application.csproj" />
     <ProjectReference Include="..\Product.Infrastructure\Product.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\CqrsDemo.BuildingBlocks.Observability\CqrsDemo.BuildingBlocks.Observability.csproj" />
   </ItemGroup>
 </Project>

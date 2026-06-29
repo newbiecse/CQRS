@@ -1,3 +1,4 @@
+using CqrsDemo.BuildingBlocks.Observability;
 using MediatR;
 using Order.Application;
 using Order.Application.Queries.GetAllOrders;
@@ -5,12 +6,14 @@ using Order.Application.Queries.GetOrderById;
 using Order.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.AddPlatformObservability("order-queries");
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddOrderApplication();
 builder.Services.AddOrderReadInfrastructure(builder.Configuration);
 
 var app = builder.Build();
+app.UsePlatformObservability();
 await app.Services.InitializeOrderReadStoreAsync();
 
 if (app.Environment.IsDevelopment())

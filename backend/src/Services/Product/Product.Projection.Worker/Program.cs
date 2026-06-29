@@ -1,9 +1,11 @@
+using CqrsDemo.BuildingBlocks.Observability;
 using CqrsDemo.BuildingBlocks.Messaging;
 using CqrsDemo.Contracts.Messaging;
 using Product.Infrastructure;
 using Product.Projection.Worker.Consumers;
 
 var builder = Host.CreateApplicationBuilder(args);
+builder.AddPlatformObservability("product-projection-worker");
 builder.Services.AddProductReadInfrastructure(builder.Configuration);
 builder.Services.AddKafkaConsumer<ProductProjectionConsumer>(
     builder.Configuration,

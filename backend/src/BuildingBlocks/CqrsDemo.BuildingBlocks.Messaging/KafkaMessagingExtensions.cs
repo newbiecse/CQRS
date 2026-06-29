@@ -71,6 +71,7 @@ public static class KafkaMessagingExtensions
                         consumerGroup,
                         configure =>
                         {
+                            configure.UseConsumeFilter<IntegrationEventCorrelationConsumeFilter>(context);
                             configure.ConfigureConsumer<TConsumer>(context);
                             configure.AutoOffsetReset = AutoOffsetReset.Earliest;
                         });

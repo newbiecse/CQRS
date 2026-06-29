@@ -1,15 +1,18 @@
+using CqrsDemo.BuildingBlocks.Observability;
 using MediatR;
 using Payment.Application;
 using Payment.Application.Queries.GetPaymentByOrderId;
 using Payment.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.AddPlatformObservability("payment-queries");
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddPaymentApplication();
 builder.Services.AddPaymentReadInfrastructure(builder.Configuration);
 
 var app = builder.Build();
+app.UsePlatformObservability();
 await app.Services.InitializePaymentReadStoreAsync();
 
 if (app.Environment.IsDevelopment())

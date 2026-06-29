@@ -1,3 +1,4 @@
+using CqrsDemo.BuildingBlocks.Observability;
 using MediatR;
 using User.Application;
 using User.Application.Commands.DeactivateUser;
@@ -6,12 +7,14 @@ using User.Application.Commands.UpdateUserProfile;
 using User.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.AddPlatformObservability("user-commands");
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddUserApplication();
 builder.Services.AddUserWriteInfrastructure(builder.Configuration);
 
 var app = builder.Build();
+app.UsePlatformObservability();
 await app.Services.InitializeUserWriteStoreAsync();
 
 if (app.Environment.IsDevelopment())

@@ -1,3 +1,4 @@
+using CqrsDemo.BuildingBlocks.Observability;
 using MediatR;
 using User.Application;
 using User.Application.Queries.GetAllUsers;
@@ -6,12 +7,14 @@ using User.Application.Queries.GetUsersByIds;
 using User.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.AddPlatformObservability("user-queries");
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddUserApplication();
 builder.Services.AddUserReadInfrastructure(builder.Configuration);
 
 var app = builder.Build();
+app.UsePlatformObservability();
 await app.Services.InitializeUserReadStoreAsync();
 
 if (app.Environment.IsDevelopment())

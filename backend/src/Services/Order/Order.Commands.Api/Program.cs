@@ -1,3 +1,4 @@
+using CqrsDemo.BuildingBlocks.Observability;
 using MediatR;
 using Order.Application;
 using Order.Application.Commands.CancelOrder;
@@ -5,12 +6,14 @@ using Order.Application.Commands.MarkOrderPaid;
 using Order.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.AddPlatformObservability("order-commands");
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddOrderApplication();
 builder.Services.AddOrderWriteInfrastructure(builder.Configuration);
 
 var app = builder.Build();
+app.UsePlatformObservability();
 await app.Services.InitializeOrderWriteStoreAsync();
 
 if (app.Environment.IsDevelopment())

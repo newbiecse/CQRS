@@ -1,15 +1,18 @@
+using CqrsDemo.BuildingBlocks.Observability;
 using MediatR;
 using Payment.Application;
 using Payment.Application.Commands.PayOrder;
 using Payment.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.AddPlatformObservability("payment-commands");
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddPaymentApplication();
 builder.Services.AddPaymentWriteInfrastructure(builder.Configuration);
 
 var app = builder.Build();
+app.UsePlatformObservability();
 await app.Services.InitializePaymentWriteStoreAsync();
 
 if (app.Environment.IsDevelopment())

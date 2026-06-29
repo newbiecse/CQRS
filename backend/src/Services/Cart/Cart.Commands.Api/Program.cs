@@ -1,3 +1,4 @@
+using CqrsDemo.BuildingBlocks.Observability;
 using Cart.Application;
 using Cart.Application.Commands.AddCartItem;
 using Cart.Application.Commands.CheckoutCart;
@@ -7,12 +8,14 @@ using Cart.Infrastructure;
 using MediatR;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.AddPlatformObservability("cart-commands");
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCartApplication();
 builder.Services.AddCartWriteInfrastructure(builder.Configuration);
 
 var app = builder.Build();
+app.UsePlatformObservability();
 await app.Services.InitializeCartWriteStoreAsync();
 
 if (app.Environment.IsDevelopment())

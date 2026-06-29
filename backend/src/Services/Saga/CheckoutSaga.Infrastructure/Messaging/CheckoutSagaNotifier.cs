@@ -21,7 +21,7 @@ public sealed class CheckoutSagaNotifier(IIntegrationEventPublisher publisher) :
             DateTime.UtcNow));
 
         return publisher.PublishAsync(
-            new IntegrationEventEnvelope(IntegrationEventTypes.CheckoutSagaCompleted, payload),
+            IntegrationEventEnvelope.Create(IntegrationEventTypes.CheckoutSagaCompleted, payload),
             cancellationToken);
     }
 
@@ -35,7 +35,7 @@ public sealed class CheckoutSagaNotifier(IIntegrationEventPublisher publisher) :
             DateTime.UtcNow));
 
         return publisher.PublishAsync(
-            new IntegrationEventEnvelope(IntegrationEventTypes.CheckoutSagaFailed, payload),
+            IntegrationEventEnvelope.Create(IntegrationEventTypes.CheckoutSagaFailed, payload),
             cancellationToken);
     }
 }

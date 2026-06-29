@@ -1,4 +1,7 @@
+using CqrsDemo.BuildingBlocks.Observability;
+
 var builder = WebApplication.CreateBuilder(args);
+builder.AddPlatformObservability("shop-gateway");
 builder.Services.AddReverseProxy().LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
 builder.Services.AddCors(options =>
 {
@@ -9,6 +12,7 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+app.UsePlatformObservability();
 
 app.UseCors();
 

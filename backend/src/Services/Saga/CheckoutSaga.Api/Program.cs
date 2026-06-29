@@ -1,3 +1,4 @@
+using CqrsDemo.BuildingBlocks.Observability;
 using CheckoutSaga.Application;
 using CheckoutSaga.Application.Commands.StartCheckoutSaga;
 using CheckoutSaga.Application.Queries.GetCheckoutSaga;
@@ -5,12 +6,14 @@ using CheckoutSaga.Infrastructure;
 using MediatR;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.AddPlatformObservability("checkout-saga-api");
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCheckoutSagaApplication();
 builder.Services.AddCheckoutSagaInfrastructure(builder.Configuration);
 
 var app = builder.Build();
+app.UsePlatformObservability();
 await app.Services.InitializeCheckoutSagaStoreAsync();
 
 if (app.Environment.IsDevelopment())
