@@ -24,6 +24,7 @@ app.MapGet("/", () => Results.Ok(new
     {
         productCommands = "/product-commands/api/products",
         productQueries = "/product-queries/api/products",
+        productSearch = "/product-queries/api/products/search?q=phone",
         cartCommands = "/cart-commands/api/carts",
         cartQueries = "/cart-queries/api/carts/{id}",
         orderQueries = "/order-queries/api/orders",
