@@ -34,6 +34,13 @@ ingress:
   adminApiHost: admin-api.local
   shopFrontendHost: shop-fe.local
 
+nodePorts:
+  enabled: false
+  shopGateway: 30500
+  shopAdminApi: 30510
+  shopFrontend: 30501
+  kibana: 30561
+
 services:
   - name: shop-gateway
     image: shop-gateway

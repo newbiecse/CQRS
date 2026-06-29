@@ -83,6 +83,22 @@ docker compose -f infra/docker/docker-compose.yml up -d
 dotnet run --project backend/tools/CqrsDemo.DatabaseInitializer
 ```
 
+## 6. Local Kubernetes (recommended script)
+
+**Start cluster + dashboard:**
+
+```powershell
+.\scripts\start-local-k8s.ps1
+```
+
+**Deploy CQRS stack:**
+
+```powershell
+.\scripts\deploy-local-k8s.ps1
+```
+
+See **[k8s/overlays/local/README.md](../k8s/overlays/local/README.md)** for hosts, NodePort URLs, and troubleshooting.
+
 ## Notes
 
 - **Secrets**: default SQL password is for local/demo. Override `sql_password` in Terraform for other environments.

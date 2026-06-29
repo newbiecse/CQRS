@@ -36,6 +36,13 @@ See **[docs/README-DISTRIBUTED.md](docs/README-DISTRIBUTED.md)** for services, p
 
 **Kubernetes / Terraform:** see **[infra/README.md](infra/README.md)**.
 
+**Local K8s one-liner (Windows):**
+
+```powershell
+.\scripts\start-local-k8s.ps1          # start cluster + dashboard
+.\scripts\deploy-local-k8s.ps1         # deploy CQRS stack
+```
+
 ## Documentation
 
 | Doc | Description |

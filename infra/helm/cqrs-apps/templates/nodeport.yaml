@@ -1,0 +1,58 @@
+{{- if .Values.nodePorts.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: shop-gateway-nodeport
+  namespace: {{ .Values.namespace }}
+spec:
+  type: NodePort
+  selector:
+    app: shop-gateway
+  ports:
+    - port: 8080
+      targetPort: 8080
+      nodePort: {{ .Values.nodePorts.shopGateway }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: shop-admin-api-nodeport
+  namespace: {{ .Values.namespace }}
+spec:
+  type: NodePort
+  selector:
+    app: shop-admin-api
+  ports:
+    - port: 8080
+      targetPort: 8080
+      nodePort: {{ .Values.nodePorts.shopAdminApi }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: shop-nodeport
+  namespace: {{ .Values.namespace }}
+spec:
+  type: NodePort
+  selector:
+    app: shop
+  ports:
+    - port: 3000
+      targetPort: 3000
+      nodePort: {{ .Values.nodePorts.shopFrontend }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kibana-nodeport
+  namespace: {{ .Values.namespace }}
+spec:
+  type: NodePort
+  selector:
+    app: kibana
+  ports:
+    - port: 5601
+      targetPort: 5601
+      nodePort: {{ .Values.nodePorts.kibana }}
+{{- end }}

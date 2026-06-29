@@ -1,0 +1,16 @@
+# Local Kubernetes overlay — used with scripts/deploy-local-k8s.ps1
+
+ingress:
+  enabled: true
+  className: nginx
+
+image:
+  pullPolicy: IfNotPresent
+
+# Expose key services via NodePort when Ingress is not ready (optional fallback).
+nodePorts:
+  enabled: true
+  shopGateway: 30500
+  shopAdminApi: 30510
+  shopFrontend: 30501
+  kibana: 30561
