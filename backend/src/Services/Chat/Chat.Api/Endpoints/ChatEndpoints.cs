@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Chat.Application.Abstractions;
 using Chat.Application.Models;
+using CqrsDemo.BuildingBlocks.RateLimiting;
 
 namespace Chat.Api.Endpoints;
 
@@ -10,7 +11,8 @@ internal static class ChatEndpoints
 
     public static void MapChatEndpoints(this WebApplication app)
     {
-        app.MapPost("/api/chat/completions", HandleChatCompletionsAsync);
+        app.MapPost("/api/chat/completions", HandleChatCompletionsAsync)
+            .RequireRateLimiting(PlatformRateLimitPolicies.Chat);
     }
 
     private static async Task HandleChatCompletionsAsync(

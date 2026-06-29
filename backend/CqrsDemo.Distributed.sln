@@ -159,6 +159,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chat.Infrastructure", "src\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chat.Api", "src\Services\Chat\Chat.Api\Chat.Api.csproj", "{D123A168-B869-40D6-941F-A200E4B8237F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CqrsDemo.BuildingBlocks.RateLimiting", "src\BuildingBlocks\CqrsDemo.BuildingBlocks.RateLimiting\CqrsDemo.BuildingBlocks.RateLimiting.csproj", "{DE08D694-3B2E-46D9-B547-7B580005EA58}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -925,6 +927,18 @@ Global
 		{D123A168-B869-40D6-941F-A200E4B8237F}.Release|x64.Build.0 = Release|Any CPU
 		{D123A168-B869-40D6-941F-A200E4B8237F}.Release|x86.ActiveCfg = Release|Any CPU
 		{D123A168-B869-40D6-941F-A200E4B8237F}.Release|x86.Build.0 = Release|Any CPU
+		{DE08D694-3B2E-46D9-B547-7B580005EA58}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE08D694-3B2E-46D9-B547-7B580005EA58}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE08D694-3B2E-46D9-B547-7B580005EA58}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{DE08D694-3B2E-46D9-B547-7B580005EA58}.Debug|x64.Build.0 = Debug|Any CPU
+		{DE08D694-3B2E-46D9-B547-7B580005EA58}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DE08D694-3B2E-46D9-B547-7B580005EA58}.Debug|x86.Build.0 = Debug|Any CPU
+		{DE08D694-3B2E-46D9-B547-7B580005EA58}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE08D694-3B2E-46D9-B547-7B580005EA58}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DE08D694-3B2E-46D9-B547-7B580005EA58}.Release|x64.ActiveCfg = Release|Any CPU
+		{DE08D694-3B2E-46D9-B547-7B580005EA58}.Release|x64.Build.0 = Release|Any CPU
+		{DE08D694-3B2E-46D9-B547-7B580005EA58}.Release|x86.ActiveCfg = Release|Any CPU
+		{DE08D694-3B2E-46D9-B547-7B580005EA58}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1007,5 +1021,6 @@ Global
 		{F6D796DC-88D0-467F-A4F6-7BD0500B19D3} = {2818967D-7B2B-91AB-F855-77049B6BD9FA}
 		{44AC1CA1-F886-4830-8DB1-9B0156C95CB6} = {2818967D-7B2B-91AB-F855-77049B6BD9FA}
 		{D123A168-B869-40D6-941F-A200E4B8237F} = {2818967D-7B2B-91AB-F855-77049B6BD9FA}
+		{DE08D694-3B2E-46D9-B547-7B580005EA58} = {909B84E9-6DFE-43AE-9C54-0C643C884DF7}
 	EndGlobalSection
 EndGlobal

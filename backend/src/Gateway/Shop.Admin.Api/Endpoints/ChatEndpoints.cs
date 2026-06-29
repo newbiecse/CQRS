@@ -1,4 +1,5 @@
 using CqrsDemo.BuildingBlocks.Auth;
+using CqrsDemo.BuildingBlocks.RateLimiting;
 using Microsoft.Extensions.Options;
 using Shop.Admin.Api.Options;
 
@@ -9,7 +10,8 @@ internal static class ChatEndpoints
     public static void MapChatEndpoints(this WebApplication app)
     {
         app.MapPost("/api/chat/completions", ProxyChatCompletionsAsync)
-            .RequireAuthorization(PlatformPolicies.Authenticated);
+            .RequireAuthorization(PlatformPolicies.Authenticated)
+            .RequireRateLimiting(PlatformRateLimitPolicies.Chat);
     }
 
     private static async Task ProxyChatCompletionsAsync(

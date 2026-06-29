@@ -1,6 +1,7 @@
 using CqrsDemo.BuildingBlocks.Auth;
 using CqrsDemo.BuildingBlocks.Observability;
 using CqrsDemo.BuildingBlocks.Observability.Http;
+using CqrsDemo.BuildingBlocks.RateLimiting;
 using Audit.Infrastructure;
 using Shop.Admin.Api.Clients;
 using Shop.Admin.Api.Endpoints;
@@ -10,6 +11,7 @@ using Shop.Admin.Api.Options;
 var builder = WebApplication.CreateBuilder(args);
 builder.AddPlatformObservability("shop-admin-api");
 
+builder.Services.AddPlatformRateLimiting(builder.Configuration);
 builder.Services.Configure<AdminShopServiceOptions>(
     builder.Configuration.GetSection(AdminShopServiceOptions.SectionName));
 builder.Services.AddHttpContextAccessor();
@@ -41,6 +43,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors();
+app.UsePlatformRateLimiting();
 app.UseAuthentication();
 app.UseAuthorization();
 

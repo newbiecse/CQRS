@@ -12,5 +12,6 @@
     <ProjectReference Include="..\..\Services\Audit\Audit.Infrastructure\Audit.Infrastructure.csproj" />
     <ProjectReference Include="..\..\BuildingBlocks\CqrsDemo.BuildingBlocks.Observability\CqrsDemo.BuildingBlocks.Observability.csproj" />
     <ProjectReference Include="..\..\BuildingBlocks\CqrsDemo.BuildingBlocks.Auth\CqrsDemo.BuildingBlocks.Auth.csproj" />
+    <ProjectReference Include="..\..\BuildingBlocks\CqrsDemo.BuildingBlocks.RateLimiting\CqrsDemo.BuildingBlocks.RateLimiting.csproj" />
   </ItemGroup>
 </Project>

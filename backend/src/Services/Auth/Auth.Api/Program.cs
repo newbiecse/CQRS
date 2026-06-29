@@ -9,6 +9,7 @@ using Auth.Infrastructure;
 using Auth.Infrastructure.Options;
 using CqrsDemo.BuildingBlocks.Auth;
 using CqrsDemo.BuildingBlocks.Observability;
+using CqrsDemo.BuildingBlocks.RateLimiting;
 using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -20,6 +21,7 @@ const string ExternalScheme = "External";
 
 var builder = WebApplication.CreateBuilder(args);
 builder.AddPlatformObservability("auth-api");
+builder.Services.AddPlatformRateLimiting(builder.Configuration);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.Configure<OAuthOptions>(builder.Configuration.GetSection(OAuthOptions.SectionName));
@@ -73,6 +75,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors();
+app.UsePlatformRateLimiting();
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -87,7 +90,7 @@ app.MapPost("/api/auth/login", async (LoginRequest request, IMediator mediator) 
 {
     var result = await mediator.Send(new LoginWithPasswordCommand(request.Email, request.Password));
     return result is null ? Results.Unauthorized() : Results.Ok(ToLoginResponse(result));
-});
+}).RequireRateLimiting(PlatformRateLimitPolicies.Auth);
 
 app.MapPost("/api/auth/register", async (RegisterRequest request, IMediator mediator) =>
 {
@@ -102,7 +105,7 @@ app.MapPost("/api/auth/register", async (RegisterRequest request, IMediator medi
     }
     catch (ArgumentException ex) { return Results.BadRequest(new { message = ex.Message }); }
     catch (InvalidOperationException ex) { return Results.BadRequest(new { message = ex.Message }); }
-});
+}).RequireRateLimiting(PlatformRateLimitPolicies.Auth);
 
 app.MapGet("/api/auth/google", (IOptions<OAuthOptions> options) =>
 {
@@ -112,9 +115,10 @@ app.MapGet("/api/auth/google", (IOptions<OAuthOptions> options) =>
     return Results.Challenge(
         new AuthenticationProperties { RedirectUri = "/api/auth/google/callback" },
         [GoogleDefaults.AuthenticationScheme]);
-});
+}).RequireRateLimiting(PlatformRateLimitPolicies.Auth);
 
-app.MapGet("/api/auth/google/callback", HandleOAuthCallbackAsync(AuthProviders.Google));
+app.MapGet("/api/auth/google/callback", HandleOAuthCallbackAsync(AuthProviders.Google))
+    .RequireRateLimiting(PlatformRateLimitPolicies.Auth);
 
 app.MapGet("/api/auth/facebook", (IOptions<OAuthOptions> options) =>
 {
@@ -124,9 +128,10 @@ app.MapGet("/api/auth/facebook", (IOptions<OAuthOptions> options) =>
     return Results.Challenge(
         new AuthenticationProperties { RedirectUri = "/api/auth/facebook/callback" },
         [FacebookDefaults.AuthenticationScheme]);
-});
+}).RequireRateLimiting(PlatformRateLimitPolicies.Auth);
 
-app.MapGet("/api/auth/facebook/callback", HandleOAuthCallbackAsync(AuthProviders.Facebook));
+app.MapGet("/api/auth/facebook/callback", HandleOAuthCallbackAsync(AuthProviders.Facebook))
+    .RequireRateLimiting(PlatformRateLimitPolicies.Auth);
 
 app.MapAdminIdentityEndpoints();
 

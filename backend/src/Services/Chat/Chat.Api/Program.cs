@@ -2,9 +2,11 @@ using System.Text.Json;
 using Chat.Api.Endpoints;
 using Chat.Infrastructure;
 using CqrsDemo.BuildingBlocks.Observability;
+using CqrsDemo.BuildingBlocks.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.AddPlatformObservability("chat-api");
+builder.Services.AddPlatformRateLimiting(builder.Configuration);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddChatInfrastructure(builder.Configuration);
@@ -19,6 +21,7 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 app.UsePlatformObservability();
 app.UseCors();
+app.UsePlatformRateLimiting();
 
 if (app.Environment.IsDevelopment())
 {

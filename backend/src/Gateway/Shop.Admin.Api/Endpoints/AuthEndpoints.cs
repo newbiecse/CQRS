@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text.Json;
 using CqrsDemo.BuildingBlocks.Auth;
+using CqrsDemo.BuildingBlocks.RateLimiting;
 using Microsoft.Extensions.Options;
 using Shop.Admin.Api.Clients;
 using Shop.Admin.Api.Options;
@@ -14,13 +15,13 @@ internal static class AuthEndpoints
     {
         var group = app.MapGroup("/api/auth");
 
-        group.MapPost("/login", LoginAsync);
-        group.MapPost("/register", RegisterAsync);
-        group.MapGet("/google", OAuthRedirectAsync("google"));
-        group.MapGet("/facebook", OAuthRedirectAsync("facebook"));
+        group.MapPost("/login", LoginAsync).RequireRateLimiting(PlatformRateLimitPolicies.Auth);
+        group.MapPost("/register", RegisterAsync).RequireRateLimiting(PlatformRateLimitPolicies.Auth);
+        group.MapGet("/google", OAuthRedirectAsync("google")).RequireRateLimiting(PlatformRateLimitPolicies.Auth);
+        group.MapGet("/facebook", OAuthRedirectAsync("facebook")).RequireRateLimiting(PlatformRateLimitPolicies.Auth);
         group.MapGet("/me", GetCurrentUserAsync).RequireAuthorization(PlatformPolicies.Authenticated);
 
-        app.MapPost("/api/login/account", LoginAsync);
+        app.MapPost("/api/login/account", LoginAsync).RequireRateLimiting(PlatformRateLimitPolicies.Auth);
         app.MapPost("/api/login/outLogin", () => Results.Ok(new { data = new { }, success = true }));
         app.MapGet("/api/currentUser", GetCurrentUserAsync).RequireAuthorization(PlatformPolicies.Authenticated);
     }

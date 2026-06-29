@@ -1,7 +1,9 @@
 using CqrsDemo.BuildingBlocks.Observability;
+using CqrsDemo.BuildingBlocks.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.AddPlatformObservability("shop-gateway");
+builder.Services.AddPlatformRateLimiting(builder.Configuration);
 builder.Services.AddReverseProxy().LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
 builder.Services.AddCors(options =>
 {
@@ -15,6 +17,7 @@ var app = builder.Build();
 app.UsePlatformObservability();
 
 app.UseCors();
+app.UsePlatformRateLimiting();
 
 app.MapGet("/", () => Results.Ok(new
 {
