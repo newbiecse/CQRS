@@ -4,8 +4,8 @@ export DOTNET_ROOT="${DOTNET_ROOT:-$HOME/.dotnet}"
 export PATH="$DOTNET_ROOT:$PATH"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
-echo "Start infrastructure: docker compose up -d"
-docker compose -f "$ROOT/docker-compose.yml" up -d
+echo "Start infrastructure: docker compose -f docker/docker-compose.yml up -d"
+docker compose -f "$ROOT/docker/docker-compose.yml" up -d
 sleep 25
 
 echo ""

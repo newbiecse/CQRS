@@ -414,7 +414,7 @@ flowchart LR
     Apps --> SBEmu
 ```
 
-Config: `docker-compose.yml`, `infrastructure/servicebus-emulator-config.json`.
+Config: `docker/docker-compose.yml` (SQL Server + Kafka).
 
 ---
 

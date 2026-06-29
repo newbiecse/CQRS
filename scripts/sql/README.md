@@ -52,6 +52,6 @@ dotnet run --project tools/CqrsDemo.DatabaseInitializer -- --export-sql
 | `CqrsDemo_Reporting` | `UserProfiles`, `OrderFacts` |
 
 Connection string template (appsettings):  
-`Server=localhost;database={name};Trusted_Connection=False;persist security info=True;Integrated Security=SSPI;`
+`Server=localhost,1433;Database={name};User Id=sa;Password=Your_password123;TrustServerCertificate=True;`
 
 The initializer tool also appends `TrustServerCertificate=True` for local SQL Server encryption.

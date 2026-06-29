@@ -1,5 +1,5 @@
 # Creates all CQRS demo databases and tables (EF Core EnsureCreated).
-# Requires SQL Server on localhost with Windows Authentication (SSPI).
+# Requires SQL Server from docker/docker-compose.yml (sa / Your_password123 on localhost:1433).
 
 $ErrorActionPreference = "Stop"
 $repoRoot = Split-Path -Parent $PSScriptRoot

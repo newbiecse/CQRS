@@ -84,9 +84,19 @@ curl -X POST http://localhost:5205/api/sagas/checkout \
 
 ```bash
 dotnet build CqrsDemo.Distributed.sln
-docker compose up -d
+docker compose -f docker/docker-compose.yml up -d
+dotnet run --project tools/CqrsDemo.DatabaseInitializer
 # See scripts/run-distributed.sh for all processes
 ```
+
+**Local infrastructure** (`docker/docker-compose.yml`):
+
+| Service | Endpoint | Credentials |
+|---------|----------|-------------|
+| SQL Server | `localhost,1433` | `sa` / `Your_password123` |
+| Kafka | `localhost:9092` | topic `shop-events` |
+
+All `appsettings.json` files use these values.
 
 ## Typical flow (with User)
 

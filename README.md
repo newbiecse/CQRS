@@ -5,7 +5,7 @@ Distributed **CQRS** + **event-driven** microservices with **transactional outbo
 ## Quick start
 
 ```bash
-docker compose up -d
+docker compose -f docker/docker-compose.yml up -d
 dotnet run --project tools/CqrsDemo.DatabaseInitializer
 dotnet build CqrsDemo.Distributed.sln
 ```

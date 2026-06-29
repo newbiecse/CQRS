@@ -13,7 +13,7 @@ using User.Infrastructure.Persistence.Read;
 using User.Infrastructure.Persistence.Write;
 
 const string connectionTemplate =
-    "Server=localhost;database={0};Trusted_Connection=False;persist security info=True;Integrated Security=SSPI;TrustServerCertificate=True;";
+    "Server=localhost,1433;Database={0};User Id=sa;Password=Your_password123;TrustServerCertificate=True;";
 
 var exportSql = args.Contains("--export-sql", StringComparer.OrdinalIgnoreCase);
 var repoRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", ".."));
