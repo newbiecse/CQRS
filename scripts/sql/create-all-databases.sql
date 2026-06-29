@@ -30,3 +30,5 @@ GO
 GO
 :r CqrsDemo_Inventory.sql
 GO
+:r CqrsDemo_Identity.sql
+GO

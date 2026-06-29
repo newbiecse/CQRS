@@ -24,6 +24,15 @@ public sealed class SqlUserWriteRepository(
         return entity is null ? null : ToAggregate(entity);
     }
 
+    public Task<bool> ExistsAsync(Guid userId, CancellationToken cancellationToken = default) =>
+        db.Users.AnyAsync(u => u.Id == userId, cancellationToken);
+
+    public Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken = default)
+    {
+        var normalized = email.Trim().ToLowerInvariant();
+        return db.Users.AnyAsync(u => u.Email == normalized, cancellationToken);
+    }
+
     public async Task UpdateAsync(UserAggregate user, CancellationToken cancellationToken = default)
     {
         var entity = await db.Users.FindAsync([user.Id], cancellationToken)

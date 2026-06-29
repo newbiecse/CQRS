@@ -1,4 +1,5 @@
 using Audit.Application.Abstractions;
+using CqrsDemo.BuildingBlocks.Auth;
 using Microsoft.Extensions.Options;
 using Shop.Admin.Api.Clients;
 using Shop.Admin.Api.Options;
@@ -10,10 +11,18 @@ internal static class AdminEndpoints
 {
     public static void MapAdminEndpoints(this WebApplication app)
     {
-        var group = app.MapGroup("/api/admin");
+        var catalog = app.MapGroup("/api/admin").RequireAuthorization(PlatformPolicies.CanManageCatalog);
+        MapCatalogRoutes(catalog);
 
-        group.MapGet("/dashboard", GetDashboardAsync);
+        var orders = app.MapGroup("/api/admin").RequireAuthorization(PlatformPolicies.CanManageOrders);
+        MapOrderRoutes(orders);
 
+        var admin = app.MapGroup("/api/admin").RequireAuthorization(PlatformPolicies.AdminOnly);
+        MapAdminOnlyRoutes(admin);
+    }
+
+    private static void MapCatalogRoutes(RouteGroupBuilder group)
+    {
         group.MapGet("/products", (AdminBackendClient client, IOptions<AdminShopServiceOptions> options, CancellationToken ct) =>
             client.GetAsync(options.Value.ProductQueries, "/api/products", ct));
 
@@ -32,15 +41,18 @@ internal static class AdminEndpoints
         group.MapDelete("/products/{id:guid}", (Guid id, AdminBackendClient client, IOptions<AdminShopServiceOptions> options, CancellationToken ct) =>
             client.DeleteAsync(options.Value.ProductCommands, $"/api/products/{id}", ct));
 
-        group.MapGet("/users", (AdminBackendClient client, IOptions<AdminShopServiceOptions> options, CancellationToken ct) =>
-            client.GetAsync(options.Value.UserQueries, "/api/users", ct));
+        group.MapGet("/inventory", (AdminBackendClient client, IOptions<AdminShopServiceOptions> options, CancellationToken ct) =>
+            client.GetAsync(options.Value.InventoryQueries, "/api/inventory", ct));
 
-        group.MapPost("/users", (RegisterUserRequest request, AdminBackendClient client, IOptions<AdminShopServiceOptions> options, CancellationToken ct) =>
-            client.PostAsync(options.Value.UserCommands, "/api/users", request, ct));
+        group.MapGet("/inventory/{productId:guid}", (Guid productId, AdminBackendClient client, IOptions<AdminShopServiceOptions> options, CancellationToken ct) =>
+            client.GetAsync(options.Value.InventoryQueries, $"/api/inventory/{productId}", ct));
 
-        group.MapPost("/users/{userId:guid}/deactivate", (Guid userId, AdminBackendClient client, IOptions<AdminShopServiceOptions> options, CancellationToken ct) =>
-            client.PostAsync(options.Value.UserCommands, $"/api/users/{userId}/deactivate", new { }, ct));
+        group.MapPut("/inventory/{productId:guid}", (Guid productId, AdjustInventoryRequest request, AdminBackendClient client, IOptions<AdminShopServiceOptions> options, CancellationToken ct) =>
+            client.PutAsync(options.Value.InventoryCommands, $"/api/inventory/{productId}", request, ct));
+    }
 
+    private static void MapOrderRoutes(RouteGroupBuilder group)
+    {
         group.MapGet("/orders", (AdminBackendClient client, IOptions<AdminShopServiceOptions> options, CancellationToken ct) =>
             client.GetAsync(options.Value.OrderQueries, "/api/orders", ct));
 
@@ -61,15 +73,20 @@ internal static class AdminEndpoints
 
         group.MapPost("/orders/{orderId:guid}/mark-paid", (Guid orderId, MarkOrderPaidRequest request, AdminBackendClient client, IOptions<AdminShopServiceOptions> options, CancellationToken ct) =>
             client.PostAsync(options.Value.OrderCommands, $"/api/orders/{orderId}/mark-paid", request, ct));
+    }
 
-        group.MapGet("/inventory", (AdminBackendClient client, IOptions<AdminShopServiceOptions> options, CancellationToken ct) =>
-            client.GetAsync(options.Value.InventoryQueries, "/api/inventory", ct));
+    private static void MapAdminOnlyRoutes(RouteGroupBuilder group)
+    {
+        group.MapGet("/dashboard", GetDashboardAsync);
 
-        group.MapGet("/inventory/{productId:guid}", (Guid productId, AdminBackendClient client, IOptions<AdminShopServiceOptions> options, CancellationToken ct) =>
-            client.GetAsync(options.Value.InventoryQueries, $"/api/inventory/{productId}", ct));
+        group.MapGet("/users", (AdminBackendClient client, IOptions<AdminShopServiceOptions> options, CancellationToken ct) =>
+            client.GetAsync(options.Value.UserQueries, "/api/users", ct));
 
-        group.MapPut("/inventory/{productId:guid}", (Guid productId, AdjustInventoryRequest request, AdminBackendClient client, IOptions<AdminShopServiceOptions> options, CancellationToken ct) =>
-            client.PutAsync(options.Value.InventoryCommands, $"/api/inventory/{productId}", request, ct));
+        group.MapPost("/users", (RegisterUserRequest request, AdminBackendClient client, IOptions<AdminShopServiceOptions> options, CancellationToken ct) =>
+            client.PostAsync(options.Value.AuthApi, "/api/auth/register", request, ct));
+
+        group.MapPost("/users/{userId:guid}/deactivate", (Guid userId, AdminBackendClient client, IOptions<AdminShopServiceOptions> options, CancellationToken ct) =>
+            client.PostAsync(options.Value.UserCommands, $"/api/users/{userId}/deactivate", new { }, ct));
 
         group.MapGet("/carts/{id:guid}", (Guid id, AdminBackendClient client, IOptions<AdminShopServiceOptions> options, CancellationToken ct) =>
             client.GetAsync(options.Value.CartQueries, $"/api/carts/{id}", ct));
@@ -169,7 +186,7 @@ internal static class AdminEndpoints
 internal sealed record CreateProductRequest(string Name, decimal Price);
 internal sealed record UpdateProductRequest(string Name, decimal Price);
 internal sealed record UpdatePriceRequest(decimal NewPrice);
-internal sealed record RegisterUserRequest(string Email, string DisplayName);
+internal sealed record RegisterUserRequest(string Email, string DisplayName, string Password, IReadOnlyList<string>? Roles = null);
 internal sealed record CancelOrderRequest(string Reason);
 internal sealed record CreateOrderRequest(Guid CustomerId, IReadOnlyList<CreateOrderLineRequest> Lines, Guid? CartId = null, Guid? OrderId = null);
 internal sealed record CreateOrderLineRequest(Guid ProductId, string ProductName, decimal UnitPrice, int Quantity);

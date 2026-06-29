@@ -29,6 +29,14 @@ public sealed class AdminBackendClient(IHttpClientFactory httpClientFactory)
     public Task<IResult> DeleteAsync(string baseUrl, string path, CancellationToken cancellationToken) =>
         SendAsync<object?>(HttpMethod.Delete, baseUrl, path, null, cancellationToken);
 
+    public Task<HttpResponseMessage> SendRawAsync(
+        HttpMethod method,
+        string baseUrl,
+        string path,
+        object? body,
+        CancellationToken cancellationToken) =>
+        SendHttpAsync(method, baseUrl, path, body, cancellationToken);
+
     public async Task<T?> ReadJsonAsync<T>(string baseUrl, string path, CancellationToken cancellationToken)
     {
         var response = await Http.GetAsync(Combine(baseUrl, path), cancellationToken);
@@ -43,12 +51,22 @@ public sealed class AdminBackendClient(IHttpClientFactory httpClientFactory)
         TBody? body,
         CancellationToken cancellationToken)
     {
+        var response = await SendHttpAsync(method, baseUrl, path, body, cancellationToken);
+        return await ToResultAsync(response, cancellationToken);
+    }
+
+    private async Task<HttpResponseMessage> SendHttpAsync(
+        HttpMethod method,
+        string baseUrl,
+        string path,
+        object? body,
+        CancellationToken cancellationToken)
+    {
         using var request = new HttpRequestMessage(method, Combine(baseUrl, path));
         if (body is not null)
             request.Content = JsonContent.Create(body, options: JsonOptions);
 
-        var response = await Http.SendAsync(request, cancellationToken);
-        return await ToResultAsync(response, cancellationToken);
+        return await Http.SendAsync(request, cancellationToken);
     }
 
     private static async Task<IResult> ToResultAsync(HttpResponseMessage response, CancellationToken cancellationToken)

@@ -2,6 +2,7 @@ using CqrsDemo.BuildingBlocks.Observability;
 using MediatR;
 using User.Application;
 using User.Application.Commands.DeactivateUser;
+using User.Application.Commands.ProvisionUser;
 using User.Application.Commands.RegisterUser;
 using User.Application.Commands.UpdateUserProfile;
 using User.Infrastructure;
@@ -27,8 +28,18 @@ app.MapGet("/", () => Results.Ok(new
 {
     service = "User.Commands.Api",
     port = 5206,
-    note = "Register users here. Use returned userId as cart CustomerId."
+    note = "User profile commands — identity is handled by Auth.Api."
 }));
+
+app.MapPost("/api/users/provision", async (ProvisionUserRequest request, IMediator mediator) =>
+{
+    try
+    {
+        await mediator.Send(new ProvisionUserCommand(request.UserId, request.Email, request.DisplayName));
+        return Results.Accepted($"/api/users/{request.UserId}", new { userId = request.UserId });
+    }
+    catch (ArgumentException ex) { return Results.BadRequest(new { message = ex.Message }); }
+});
 
 app.MapPost("/api/users", async (RegisterUserRequest request, IMediator mediator) =>
 {
@@ -38,6 +49,7 @@ app.MapPost("/api/users", async (RegisterUserRequest request, IMediator mediator
         return Results.Created($"/api/users/{id}", new { userId = id });
     }
     catch (ArgumentException ex) { return Results.BadRequest(new { message = ex.Message }); }
+    catch (InvalidOperationException ex) { return Results.BadRequest(new { message = ex.Message }); }
 });
 
 app.MapPut("/api/users/{userId:guid}/profile", async (Guid userId, UpdateProfileRequest request, IMediator mediator) =>
@@ -60,5 +72,6 @@ static async Task<IResult> ExecuteAsync(Func<Task> action)
     catch (ArgumentException ex) { return Results.BadRequest(new { message = ex.Message }); }
 }
 
+internal sealed record ProvisionUserRequest(Guid UserId, string Email, string DisplayName);
 internal sealed record RegisterUserRequest(string Email, string DisplayName);
 internal sealed record UpdateProfileRequest(string DisplayName);

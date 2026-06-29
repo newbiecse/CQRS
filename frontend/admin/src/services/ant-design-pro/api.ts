@@ -1,8 +1,9 @@
 // @ts-ignore
 /* eslint-disable */
 import { request } from '@umijs/max';
+import { clearAccessToken, getAccessToken, setAccessToken } from '@/utils/auth';
 
-/** 获取当前的用户 GET /api/currentUser */
+/** Current user from JWT-backed BFF */
 export async function currentUser(options?: { [key: string]: any }) {
   return request<{
     data: API.CurrentUser;
@@ -12,24 +13,32 @@ export async function currentUser(options?: { [key: string]: any }) {
   });
 }
 
-/** 退出登录接口 POST /api/login/outLogin */
+/** Logout (client clears token) */
 export async function outLogin(options?: { [key: string]: any }) {
+  clearAccessToken();
   return request<Record<string, any>>('/api/login/outLogin', {
     method: 'POST',
     ...(options || {}),
   });
 }
 
-/** 登录接口 POST /api/login/account */
+/** Login via Shop.Admin.Api JWT */
 export async function login(body: API.LoginParams, options?: { [key: string]: any }) {
-  return request<API.LoginResult>('/api/login/account', {
+  const result = await request<API.LoginResult>('/api/login/account', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     data: body,
+    skipErrorHandler: true,
     ...(options || {}),
   });
+
+  if (result?.token) {
+    setAccessToken(result.token);
+  }
+
+  return result;
 }
 
 /** 此处后端没有提供注释 GET /api/notices */
@@ -43,10 +52,7 @@ export async function getNotices(options?: { [key: string]: any }) {
 /** 获取规则列表 GET /api/rule */
 export async function rule(
   params: {
-    // query
-    /** 当前的页码 */
     current?: number;
-    /** 页面的容量 */
     pageSize?: number;
   },
   options?: { [key: string]: any },

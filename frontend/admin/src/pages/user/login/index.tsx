@@ -1,10 +1,7 @@
 import {
-  AlipayCircleOutlined,
   LockOutlined,
   MobileOutlined,
-  TaobaoCircleOutlined,
   UserOutlined,
-  WeiboCircleOutlined,
 } from '@ant-design/icons';
 import {
   LoginForm,
@@ -21,9 +18,10 @@ import {
 } from '@umijs/max';
 import { Alert, App, Button, Tabs } from 'antd';
 import { createStyles } from 'antd-style';
-import React, { startTransition, useState } from 'react';
+import React, { startTransition, useEffect, useState } from 'react';
 import { Footer } from '@/components';
 import { login } from '@/services/ant-design-pro/api';
+import { setAccessToken } from '@/utils/auth';
 import { getFakeCaptcha } from '@/services/ant-design-pro/login';
 import Settings from '../../../../config/defaultSettings';
 
@@ -86,18 +84,24 @@ const ActionIcons = () => {
 
   return (
     <>
-      <AlipayCircleOutlined
-        key="AlipayCircleOutlined"
+      <a
+        key="google"
+        href="/api/auth/google"
         className={styles.action}
-      />
-      <TaobaoCircleOutlined
-        key="TaobaoCircleOutlined"
+        title="Google"
+        aria-label="Sign in with Google"
+      >
+        G
+      </a>
+      <a
+        key="facebook"
+        href="/api/auth/facebook"
         className={styles.action}
-      />
-      <WeiboCircleOutlined
-        key="WeiboCircleOutlined"
-        className={styles.action}
-      />
+        title="Facebook"
+        aria-label="Sign in with Facebook"
+      >
+        f
+      </a>
     </>
   );
 };
@@ -134,6 +138,34 @@ const Login: React.FC = () => {
   const { styles } = useStyles();
   const { message } = App.useApp();
   const intl = useIntl();
+
+  useEffect(() => {
+    const params = new URL(window.location.href).searchParams;
+    const oauthError = params.get('error');
+    if (oauthError) {
+      message.error(`OAuth login failed (${oauthError}).`);
+      return;
+    }
+
+    const token = params.get('token');
+    const status = params.get('status');
+    if (token && status === 'ok') {
+      setAccessToken(token);
+      void (async () => {
+        const userInfo = await initialState?.fetchUserInfo?.();
+        if (userInfo) {
+          startTransition(() => {
+            setInitialState((s) => ({
+              ...s,
+              currentUser: userInfo,
+            }));
+          });
+        }
+        const redirectUrl = getSafeRedirectUrl(params.get('redirect'));
+        window.location.href = redirectUrl;
+      })();
+    }
+  }, []);
 
   const fetchUserInfo = async () => {
     const userInfo = await initialState?.fetchUserInfo?.();

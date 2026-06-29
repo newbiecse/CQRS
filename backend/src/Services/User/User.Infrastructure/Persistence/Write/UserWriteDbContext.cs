@@ -19,6 +19,7 @@ public sealed class UserWriteDbContext(DbContextOptions<UserWriteDbContext> opti
             entity.HasKey(u => u.Id);
             entity.Property(u => u.Email).HasMaxLength(320).IsRequired();
             entity.Property(u => u.DisplayName).HasMaxLength(200).IsRequired();
+            entity.HasIndex(u => u.Email).IsUnique();
         });
 
         OutboxPersistence.ConfigureOutbox(modelBuilder);

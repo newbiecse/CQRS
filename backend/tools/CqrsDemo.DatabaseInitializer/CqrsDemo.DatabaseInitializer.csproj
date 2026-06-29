@@ -16,6 +16,7 @@
     <ProjectReference Include="..\..\src\Services\Product\Product.Infrastructure\Product.Infrastructure.csproj" />
     <ProjectReference Include="..\..\src\Services\Reporting\Reporting.Infrastructure\Reporting.Infrastructure.csproj" />
     <ProjectReference Include="..\..\src\Services\Saga\CheckoutSaga.Infrastructure\CheckoutSaga.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Services\Auth\Auth.Infrastructure\Auth.Infrastructure.csproj" />
     <ProjectReference Include="..\..\src\Services\Inventory\Inventory.Infrastructure\Inventory.Infrastructure.csproj" />
     <ProjectReference Include="..\..\src\Services\User\User.Infrastructure\User.Infrastructure.csproj" />
   </ItemGroup>

@@ -15,6 +15,18 @@ export default {
       target: 'http://localhost:5100',
       changeOrigin: true,
     },
+    '/api/auth': {
+      target: 'http://localhost:5100',
+      changeOrigin: true,
+    },
+    '/api/login': {
+      target: 'http://localhost:5100',
+      changeOrigin: true,
+    },
+    '/api/currentUser': {
+      target: 'http://localhost:5100',
+      changeOrigin: true,
+    },
   },
   /**
    * @name 详细的代理配置

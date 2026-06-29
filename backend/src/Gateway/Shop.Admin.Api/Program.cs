@@ -1,3 +1,4 @@
+using CqrsDemo.BuildingBlocks.Auth;
 using CqrsDemo.BuildingBlocks.Observability;
 using Audit.Infrastructure;
 using Shop.Admin.Api.Clients;
@@ -12,6 +13,7 @@ builder.Services.Configure<AdminShopServiceOptions>(
 builder.Services.AddCorrelationForwardingHttpClient("admin-backend");
 builder.Services.AddSingleton<AdminBackendClient>();
 builder.Services.AddAuditElasticsearch(builder.Configuration);
+builder.Services.AddPlatformJwtAuthentication(builder.Configuration);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCors(options =>
@@ -32,14 +34,17 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors();
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapGet("/", () => Results.Ok(new
 {
     service = "Shop.Admin.Api",
     port = 5100,
-    description = "BFF for admin portal — orchestrates domain microservices",
-    routes = "/api/admin/*"
+    description = "BFF for admin portal — JWT auth + orchestrates domain microservices",
+    routes = new[] { "/api/auth/*", "/api/admin/*" }
 }));
 
+app.MapAuthEndpoints();
 app.MapAdminEndpoints();
 app.Run();

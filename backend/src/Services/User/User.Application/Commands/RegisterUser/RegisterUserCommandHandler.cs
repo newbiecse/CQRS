@@ -9,7 +9,11 @@ public sealed class RegisterUserCommandHandler(IUserWriteRepository repository)
 {
     public async Task<Guid> Handle(RegisterUserCommand request, CancellationToken ct)
     {
-        var user = UserAggregate.Register(request.Email, request.DisplayName);
+        var email = request.Email.Trim().ToLowerInvariant();
+        if (await repository.ExistsByEmailAsync(email, ct))
+            throw new InvalidOperationException($"Email '{email}' is already registered.");
+
+        var user = UserAggregate.Register(Guid.NewGuid(), email, request.DisplayName);
         await repository.AddAsync(user, ct);
         return user.Id;
     }

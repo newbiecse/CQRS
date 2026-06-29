@@ -14,6 +14,7 @@ declare namespace API {
     notifyCount?: number;
     unreadCount?: number;
     country?: string;
+    roles?: string[];
     access?: string;
     geographic?: {
       province?: { label?: string; key?: string };
@@ -27,6 +28,7 @@ declare namespace API {
     status?: string;
     type?: string;
     currentAuthority?: string;
+    token?: string;
   };
 
   type PageParams = {

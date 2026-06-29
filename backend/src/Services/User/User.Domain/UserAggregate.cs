@@ -12,8 +12,9 @@ public sealed class UserAggregate : AggregateRoot
 
     private UserAggregate() { }
 
-    public static UserAggregate Register(string email, string displayName)
+    public static UserAggregate Register(Guid userId, string email, string displayName)
     {
+        if (userId == Guid.Empty) throw new ArgumentException("User id is required.", nameof(userId));
         if (string.IsNullOrWhiteSpace(email)) throw new ArgumentException("Email is required.", nameof(email));
         if (!email.Contains('@')) throw new ArgumentException("Email format is invalid.", nameof(email));
         if (string.IsNullOrWhiteSpace(displayName)) throw new ArgumentException("Display name is required.", nameof(displayName));
@@ -22,7 +23,7 @@ public sealed class UserAggregate : AggregateRoot
         var trimmedName = displayName.Trim();
         var user = new UserAggregate
         {
-            Id = Guid.NewGuid(),
+            Id = userId,
             Email = normalizedEmail,
             DisplayName = trimmedName,
             IsActive = true,
