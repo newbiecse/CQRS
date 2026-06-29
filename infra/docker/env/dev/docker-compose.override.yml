@@ -1,0 +1,23 @@
+# Development — local laptop, exposed ports, demo credentials.
+name: cqrs-dev
+
+services:
+  sqlserver:
+    container_name: cqrs-dev-sqlserver
+    restart: unless-stopped
+
+  kafka:
+    container_name: cqrs-dev-kafka
+    restart: unless-stopped
+
+  elasticsearch:
+    container_name: cqrs-dev-elasticsearch
+    restart: unless-stopped
+
+  kibana:
+    container_name: cqrs-dev-kibana
+    restart: unless-stopped
+
+  otel-collector:
+    container_name: cqrs-dev-otel-collector
+    restart: unless-stopped

@@ -2,38 +2,38 @@
 Server={{ $.Values.sql.host }},{{ $.Values.sql.port }};Database={{ . }};User Id={{ $.Values.sql.user }};Password={{ $.Values.sql.password }};TrustServerCertificate=True;
 {{- end }}
 
-{{- range .Values.services }}
+{{- range $name, $svc := .Values.services }}
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .name }}
+  name: {{ $name }}
   namespace: {{ $.Values.namespace }}
   labels:
-    app: {{ .name }}
+    app: {{ $name }}
     app.kubernetes.io/part-of: cqrs-demo
 spec:
-  replicas: 1
+  replicas: {{ $svc.replicas | default $.Values.replicaCount | default 1 }}
   selector:
     matchLabels:
-      app: {{ .name }}
+      app: {{ $name }}
   template:
     metadata:
       labels:
-        app: {{ .name }}
+        app: {{ $name }}
         tier: app
     spec:
       containers:
-        - name: {{ .name }}
-          image: "{{ $.Values.image.registry }}/{{ .image }}:{{ $.Values.image.tag }}"
+        - name: {{ $name }}
+          image: "{{ $.Values.image.registry }}/{{ $svc.image }}:{{ $.Values.image.tag }}"
           imagePullPolicy: {{ $.Values.image.pullPolicy }}
           ports:
-            {{- if eq .kind "api" }}
-            - containerPort: {{ .port }}
+            {{- if eq $svc.kind "api" }}
+            - containerPort: {{ $svc.port }}
             {{- end }}
           env:
             - name: ASPNETCORE_URLS
-              value: http://+:{{ default 8080 .port }}
+              value: http://+:{{ default 8080 $svc.port }}
             - name: MSSQL_SA_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -49,41 +49,41 @@ spec:
               value: {{ $.Values.observability.otlpEndpoint | quote }}
             - name: Observability__ElasticsearchUrl
               value: {{ $.Values.elasticsearch.url | quote }}
-            {{- if .writeDb }}
+            {{- if $svc.writeDb }}
             - name: ConnectionStrings__WriteDb
-              value: {{ include "cqrs.connectionString" .writeDb | quote }}
+              value: {{ include "cqrs.connectionString" $svc.writeDb | quote }}
             {{- end }}
-            {{- if .readDb }}
+            {{- if $svc.readDb }}
             - name: ConnectionStrings__ReadDb
-              value: {{ include "cqrs.connectionString" .readDb | quote }}
+              value: {{ include "cqrs.connectionString" $svc.readDb | quote }}
             {{- end }}
-            {{- range $key, $value := .env }}
+            {{- range $key, $value := default dict $svc.env }}
             - name: {{ $key }}
               value: {{ $value | quote }}
             {{- end }}
-            {{- range $key, $value := default dict .extraEnv }}
+            {{- range $key, $value := default dict $svc.extraEnv }}
             - name: {{ $key }}
               value: {{ $value | quote }}
             {{- end }}
           resources:
             requests:
-              memory: 128Mi
-              cpu: 100m
+              memory: {{ dig "resources" "requests" "memory" "128Mi" $svc }}
+              cpu: {{ dig "resources" "requests" "cpu" "100m" $svc }}
             limits:
-              memory: 512Mi
-              cpu: 500m
-{{- if eq .kind "api" }}
+              memory: {{ dig "resources" "limits" "memory" "512Mi" $svc }}
+              cpu: {{ dig "resources" "limits" "cpu" "500m" $svc }}
+{{- if eq $svc.kind "api" }}
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .name }}
+  name: {{ $name }}
   namespace: {{ $.Values.namespace }}
 spec:
   selector:
-    app: {{ .name }}
+    app: {{ $name }}
   ports:
-    - port: {{ .port }}
-      targetPort: {{ .port }}
+    - port: {{ $svc.port }}
+      targetPort: {{ $svc.port }}
 {{- end }}
 {{- end }}

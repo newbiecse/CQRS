@@ -1,0 +1,26 @@
+# Production-like Docker stack (on-prem / VM). Prefer managed SQL/Kafka/ES in real prod.
+# Use strong secrets via .env — do not commit .env.
+name: cqrs-prod
+
+services:
+  sqlserver:
+    container_name: cqrs-prod-sqlserver
+    restart: always
+
+  kafka:
+    container_name: cqrs-prod-kafka
+    restart: always
+
+  elasticsearch:
+    container_name: cqrs-prod-elasticsearch
+    environment:
+      ES_JAVA_OPTS: -Xms1g -Xmx1g
+    restart: always
+
+  kibana:
+    container_name: cqrs-prod-kibana
+    restart: always
+
+  otel-collector:
+    container_name: cqrs-prod-otel-collector
+    restart: always

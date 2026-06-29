@@ -1,12 +1,18 @@
+variable "environment" {
+  type        = string
+  description = "Target environment: dev, staging, or prod"
+  default     = "dev"
+
+  validation {
+    condition     = contains(["dev", "staging", "prod"], var.environment)
+    error_message = "environment must be one of: dev, staging, prod."
+  }
+}
+
 variable "kubeconfig_path" {
   type        = string
   description = "Path to kubeconfig file"
   default     = "~/.kube/config"
-}
-
-variable "namespace" {
-  type    = string
-  default = "cqrs-demo"
 }
 
 variable "image_registry" {

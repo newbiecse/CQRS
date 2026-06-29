@@ -1,0 +1,25 @@
+# Staging — pre-production validation; moderate resources, distinct container names.
+name: cqrs-staging
+
+services:
+  sqlserver:
+    container_name: cqrs-staging-sqlserver
+    restart: unless-stopped
+
+  kafka:
+    container_name: cqrs-staging-kafka
+    restart: unless-stopped
+
+  elasticsearch:
+    container_name: cqrs-staging-elasticsearch
+    environment:
+      ES_JAVA_OPTS: -Xms768m -Xmx768m
+    restart: unless-stopped
+
+  kibana:
+    container_name: cqrs-staging-kibana
+    restart: unless-stopped
+
+  otel-collector:
+    container_name: cqrs-staging-otel-collector
+    restart: unless-stopped

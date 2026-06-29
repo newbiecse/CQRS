@@ -1,4 +1,14 @@
-# Local Kubernetes (Windows / Docker Desktop / minikube)
+# Deprecated: use overlays/dev. Kept for backward compatibility.
+
+See **[../dev](../dev)** and **[environments/README.md](../../../environments/README.md)**.
+
+Deploy with:
+
+```powershell
+.\scripts\deploy-local-k8s.ps1 -Environment dev
+```
+
+`overlays/local` is an alias that applies the same Kustomize resources as `dev`.
 
 ## Prerequisites
 
@@ -54,10 +64,8 @@ Sau khi cluster chạy, deploy app:
 Từ thư mục gốc repo (PowerShell):
 
 ```powershell
-.\scripts\deploy-local-k8s.ps1
+.\scripts\deploy-local-k8s.ps1 -Environment dev
 ```
-
-Script sẽ tự động:
 
 1. Cài **ingress-nginx** (Helm)
 2. Deploy **infra** (SQL Server, Kafka, Elasticsearch, Kibana, OTEL)

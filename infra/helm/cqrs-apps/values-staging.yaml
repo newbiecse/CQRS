@@ -1,0 +1,23 @@
+﻿# Staging - pre-production
+namespace: cqrs-demo-staging
+
+image:
+  pullPolicy: Always
+
+replicaCount: 1
+
+ingress:
+  enabled: true
+  shopGatewayHost: shop.staging.example.com
+  adminApiHost: admin-api.staging.example.com
+  shopFrontendHost: shop-fe.staging.example.com
+
+nodePorts:
+  enabled: true
+  shopGateway: 31080
+  shopAdminApi: 31081
+  shopFrontend: 31082
+  kibana: 31061
+
+dbInit:
+  enabled: true

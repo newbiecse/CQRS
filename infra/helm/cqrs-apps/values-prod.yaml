@@ -1,0 +1,19 @@
+﻿# Production - use External Secrets for sql.password in real deployments
+namespace: cqrs-demo-prod
+
+image:
+  pullPolicy: Always
+
+replicaCount: 2
+
+ingress:
+  enabled: true
+  shopGatewayHost: shop.example.com
+  adminApiHost: admin-api.example.com
+  shopFrontendHost: shop-fe.example.com
+
+nodePorts:
+  enabled: false
+
+dbInit:
+  enabled: false

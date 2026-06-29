@@ -13,6 +13,8 @@
   .\scripts\deploy-local-k8s.ps1 -SkipBuild -SkipIngress
 #>
 param(
+    [ValidateSet('dev', 'staging', 'prod')]
+    [string]$Environment = 'dev',
     [switch]$InfraOnly,
     [switch]$SkipBuild,
     [switch]$SkipIngress,
@@ -23,7 +25,9 @@ param(
 
 $ErrorActionPreference = "Stop"
 $RepoRoot = Split-Path -Parent $PSScriptRoot
-$Namespace = "cqrs-demo"
+. "$PSScriptRoot\_infra-env.ps1"
+$InfraPaths = Get-InfraEnvironmentPaths -Environment $Environment
+$Namespace = $InfraPaths.Namespace
 
 function Write-Step([string]$Message) {
     Write-Host ""
@@ -108,8 +112,8 @@ function Import-ImagesToMinikube([string]$Registry, [string]$Tag) {
 }
 
 function Deploy-Infra {
-    Write-Step "Applying platform infrastructure (Kustomize)..."
-    kubectl apply -k "$RepoRoot\infra\k8s\overlays\local"
+    Write-Step "Applying platform infrastructure (Kustomize, environment: $Environment)..."
+    kubectl apply -k $InfraPaths.K8sOverlay
 
     Write-Host "Waiting for SQL Server (can take 2-5 minutes on first run)..."
     kubectl wait --for=condition=ready pod -l app=sqlserver -n $Namespace --timeout=600s
@@ -122,19 +126,42 @@ function Deploy-Infra {
 }
 
 function Deploy-Apps {
-    Write-Step "Installing microservices (Helm)..."
-    helm upgrade --install cqrs-apps "$RepoRoot\infra\helm\cqrs-apps" `
-        --namespace $Namespace `
-        --create-namespace `
-        -f "$RepoRoot\infra\k8s\overlays\local\helm-values.yaml" `
-        --set "image.registry=$ImageRegistry" `
-        --set "image.tag=$ImageTag" `
-        --set "sql.password=Your_password123" `
-        --set "dbInit.image=${ImageRegistry}/db-initializer" `
-        --wait --timeout 15m
+    Write-Step "Installing microservices (Helm, environment: $Environment)..."
 
-    Write-Host "Waiting for database initializer job..."
-    kubectl wait --for=condition=complete job/db-initializer -n $Namespace --timeout=600s
+    $setArgs = @(
+        '--set', "image.registry=$ImageRegistry",
+        '--set', "image.tag=$ImageTag",
+        '--set', "sql.password=Your_password123",
+        '--set', "dbInit.image=${ImageRegistry}/db-initializer"
+    )
+
+    if (Get-Command helmfile -ErrorAction SilentlyContinue) {
+        Write-Host "Using Helmfile (helmfile -e $Environment apply)..."
+        Push-Location (Join-Path $RepoRoot 'infra\helm')
+        try {
+            helmfile -e $Environment apply --set image.registry=$ImageRegistry --set image.tag=$ImageTag `
+                --set sql.password=Your_password123 --set dbInit.image="${ImageRegistry}/db-initializer"
+            if ($LASTEXITCODE -ne 0) { throw "helmfile apply failed" }
+        } finally {
+            Pop-Location
+        }
+    } else {
+        Write-Host "Helmfile not found — using helm with layered values files..."
+        $helmArgs = @(
+            'upgrade', '--install', 'cqrs-apps', $InfraPaths.HelmChart,
+            '--namespace', $Namespace,
+            '--create-namespace',
+            '-f', $InfraPaths.HelmValuesBase,
+            '-f', $InfraPaths.HelmValuesEnv
+        ) + $setArgs + @('--wait', '--timeout', '15m')
+        helm @helmArgs
+        if ($LASTEXITCODE -ne 0) { throw "helm upgrade failed" }
+    }
+
+    if ($Environment -ne 'prod') {
+        Write-Host "Waiting for database initializer job..."
+        kubectl wait --for=condition=complete job/db-initializer -n $Namespace --timeout=600s
+    }
 }
 
 function Show-AccessInfo {
@@ -170,7 +197,7 @@ Status:  kubectl get pods -n $Namespace
 }
 
 # --- main ---
-Write-Step "CQRS Demo — local Kubernetes deploy"
+Write-Step "CQRS Demo — Kubernetes deploy ($Environment)"
 Assert-Command kubectl
 Assert-Command helm
 Assert-Command docker

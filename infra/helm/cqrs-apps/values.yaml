@@ -1,9 +1,14 @@
+﻿# Shared defaults and service catalog (environment-agnostic).
+# Override per env with values-dev.yaml | values-staging.yaml | values-prod.yaml
+
 namespace: cqrs-demo
 
 image:
   registry: cqrsdemo
   tag: latest
   pullPolicy: IfNotPresent
+
+replicaCount: 1
 
 sql:
   host: sqlserver
@@ -28,7 +33,7 @@ dbInit:
   image: cqrsdemo/db-initializer
 
 ingress:
-  enabled: true
+  enabled: false
   className: nginx
   shopGatewayHost: shop.local
   adminApiHost: admin-api.local
@@ -40,118 +45,117 @@ nodePorts:
   shopAdminApi: 30510
   shopFrontend: 30501
   kibana: 30561
-
 services:
-  - name: shop-gateway
+  shop-gateway:
     image: shop-gateway
     kind: api
     port: 8080
     env:
       ASPNETCORE_ENVIRONMENT: Kubernetes
-  - name: shop-admin-api
+  shop-admin-api:
     image: shop-admin-api
     kind: api
     port: 8080
     env:
       ASPNETCORE_ENVIRONMENT: Kubernetes
-  - name: product-commands
+  product-commands:
     image: product-commands
     kind: api
     port: 8080
     writeDb: CqrsDemo_Product_Write
-  - name: product-queries
+  product-queries:
     image: product-queries
     kind: api
     port: 8080
     readDb: CqrsDemo_Product_Read
-  - name: product-projection-worker
+  product-projection-worker:
     image: product-projection-worker
     kind: worker
     readDb: CqrsDemo_Product_Read
-  - name: cart-commands
+  cart-commands:
     image: cart-commands
     kind: api
     port: 8080
     writeDb: CqrsDemo_Cart_Write
-  - name: cart-queries
+  cart-queries:
     image: cart-queries
     kind: api
     port: 8080
     readDb: CqrsDemo_Cart_Read
-  - name: cart-projection-worker
+  cart-projection-worker:
     image: cart-projection-worker
     kind: worker
     readDb: CqrsDemo_Cart_Read
-  - name: order-commands
+  order-commands:
     image: order-commands
     kind: api
     port: 8080
     writeDb: CqrsDemo_Order_Write
-  - name: order-queries
+  order-queries:
     image: order-queries
     kind: api
     port: 8080
     readDb: CqrsDemo_Order_Read
-  - name: order-projection-worker
+  order-projection-worker:
     image: order-projection-worker
     kind: worker
     readDb: CqrsDemo_Order_Read
-  - name: order-integration-worker
+  order-integration-worker:
     image: order-integration-worker
     kind: worker
     readDb: CqrsDemo_Order_Read
-  - name: payment-commands
+  payment-commands:
     image: payment-commands
     kind: api
     port: 8080
     writeDb: CqrsDemo_Payment_Write
     extraEnv:
       OrderService__BaseUrl: http://order-queries:8080
-  - name: payment-queries
+  payment-queries:
     image: payment-queries
     kind: api
     port: 8080
     readDb: CqrsDemo_Payment_Read
-  - name: payment-projection-worker
+  payment-projection-worker:
     image: payment-projection-worker
     kind: worker
     readDb: CqrsDemo_Payment_Read
-  - name: user-commands
+  user-commands:
     image: user-commands
     kind: api
     port: 8080
     writeDb: CqrsDemo_User_Write
-  - name: user-queries
+  user-queries:
     image: user-queries
     kind: api
     port: 8080
     readDb: CqrsDemo_User_Read
-  - name: user-projection-worker
+  user-projection-worker:
     image: user-projection-worker
     kind: worker
     readDb: CqrsDemo_User_Read
-  - name: reporting-queries
+  reporting-queries:
     image: reporting-queries
     kind: api
     port: 8080
     readDb: CqrsDemo_Reporting
-  - name: reporting-projection-worker
+  reporting-projection-worker:
     image: reporting-projection-worker
     kind: worker
     readDb: CqrsDemo_Reporting
-  - name: checkout-saga-api
+  checkout-saga-api:
     image: checkout-saga-api
     kind: api
     port: 8080
-  - name: checkout-saga-worker
+  checkout-saga-worker:
     image: checkout-saga-worker
     kind: worker
-  - name: audit-projection-worker
+  audit-projection-worker:
     image: audit-projection-worker
     kind: worker
 
 frontends:
-  - name: shop
+  shop:
     image: shop
     port: 3000
     env:

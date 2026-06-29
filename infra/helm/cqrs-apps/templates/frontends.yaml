@@ -1,29 +1,29 @@
-{{- range .Values.frontends }}
+{{- range $name, $fe := .Values.frontends }}
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .name }}
+  name: {{ $name }}
   namespace: {{ $.Values.namespace }}
 spec:
-  replicas: 1
+  replicas: {{ $fe.replicas | default $.Values.replicaCount | default 1 }}
   selector:
     matchLabels:
-      app: {{ .name }}
+      app: {{ $name }}
   template:
     metadata:
       labels:
-        app: {{ .name }}
+        app: {{ $name }}
         tier: frontend
     spec:
       containers:
-        - name: {{ .name }}
-          image: "{{ $.Values.image.registry }}/{{ .image }}:{{ $.Values.image.tag }}"
+        - name: {{ $name }}
+          image: "{{ $.Values.image.registry }}/{{ $fe.image }}:{{ $.Values.image.tag }}"
           imagePullPolicy: {{ $.Values.image.pullPolicy }}
           ports:
-            - containerPort: {{ .port }}
+            - containerPort: {{ $fe.port }}
           env:
-            {{- range $key, $value := .env }}
+            {{- range $key, $value := default dict $fe.env }}
             - name: {{ $key }}
               value: {{ $value | quote }}
             {{- end }}
@@ -31,12 +31,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .name }}
+  name: {{ $name }}
   namespace: {{ $.Values.namespace }}
 spec:
   selector:
-    app: {{ .name }}
+    app: {{ $name }}
   ports:
-    - port: {{ .port }}
-      targetPort: {{ .port }}
+    - port: {{ $fe.port }}
+      targetPort: {{ $fe.port }}
 {{- end }}

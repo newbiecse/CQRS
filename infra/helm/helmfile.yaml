@@ -1,0 +1,27 @@
+# Helmfile — standard multi-environment orchestration (used with helmfile -e dev|staging|prod apply)
+# https://helmfile.readthedocs.io/
+
+helmDefaults:
+  wait: true
+  timeout: 900
+  createNamespace: true
+
+environments:
+  dev:
+    values:
+      - namespace: cqrs-demo
+  staging:
+    values:
+      - namespace: cqrs-demo-staging
+  prod:
+    values:
+      - namespace: cqrs-demo-prod
+
+---
+releases:
+  - name: cqrs-apps
+    namespace: "{{ .Values.namespace }}"
+    chart: ./cqrs-apps
+    values:
+      - ./cqrs-apps/values.yaml
+      - ./cqrs-apps/values-{{ .Environment.Name }}.yaml

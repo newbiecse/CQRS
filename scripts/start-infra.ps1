@@ -1,35 +1,36 @@
-# Start local infrastructure: SQL Server, Kafka, Elasticsearch, Kibana, OTEL collector.
+# Start infrastructure: SQL Server, Kafka, Elasticsearch, Kibana, OTEL collector.
 # Requires Docker Desktop (or Docker Engine) with compose v2.
 
+param(
+    [ValidateSet('dev', 'staging', 'prod')]
+    [string]$Environment = 'dev'
+)
+
 $ErrorActionPreference = "Stop"
-$repoRoot = Split-Path -Parent $PSScriptRoot
-$composeFile = Join-Path $repoRoot "infra\docker\docker-compose.yml"
+. "$PSScriptRoot\_infra-env.ps1"
 
 if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
     Write-Error "Docker is not installed or not on PATH."
 }
 
-Write-Host "Starting infrastructure (docker compose)..."
-docker compose -f $composeFile up -d
+$paths = Get-InfraEnvironmentPaths -Environment $Environment
+
+Write-Host "Starting infrastructure (docker compose, environment: $Environment)..."
+Invoke-DockerCompose -Environment $Environment up -d
 
 Write-Host ""
-Write-Host "Waiting for containers to become healthy (up to 90s)..."
-$deadline = (Get-Date).AddSeconds(90)
-do {
-    $ps = docker compose -f $composeFile ps --format json 2>$null | ConvertFrom-Json
-    $unhealthy = @($ps | Where-Object { $_.Health -and $_.Health -ne "healthy" })
-    if ($unhealthy.Count -eq 0) { break }
-    Start-Sleep -Seconds 3
-} while ((Get-Date) -lt $deadline)
+Write-Host "Waiting for containers (30s)..."
+Start-Sleep -Seconds 30
 
 Write-Host ""
-docker compose -f $composeFile ps
+Invoke-DockerCompose -Environment $Environment ps
 Write-Host ""
-Write-Host "Infrastructure started."
-Write-Host "  SQL Server     localhost:1433  (sa / Your_password123)"
+Write-Host "Infrastructure started ($Environment)."
+Write-Host "  SQL Server     localhost:1433"
 Write-Host "  Kafka          localhost:9092"
 Write-Host "  Elasticsearch  localhost:9200"
 Write-Host "  Kibana         http://localhost:5601"
 Write-Host "  OTLP gRPC      localhost:4317"
 Write-Host ""
+Write-Host "Copy infra/docker/env/$Environment/.env.example to .env to override secrets."
 Write-Host "Next: .\scripts\initialize-databases.ps1"

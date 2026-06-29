@@ -1,0 +1,19 @@
+﻿# Development - local cluster / Docker Desktop
+namespace: cqrs-demo
+
+image:
+  pullPolicy: IfNotPresent
+
+replicaCount: 1
+
+ingress:
+  enabled: true
+  shopGatewayHost: shop.local
+  adminApiHost: admin-api.local
+  shopFrontendHost: shop-fe.local
+
+nodePorts:
+  enabled: true
+
+dbInit:
+  enabled: true
