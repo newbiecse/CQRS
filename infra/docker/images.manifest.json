@@ -1,0 +1,124 @@
+﻿{
+    "images":  [
+                   {
+                       "name":  "shop-gateway",
+                       "dockerfile":  "backend/src/Gateway/Shop.Gateway.Api/Dockerfile"
+                   },
+                   {
+                       "name":  "shop-admin-api",
+                       "dockerfile":  "backend/src/Gateway/Shop.Admin.Api/Dockerfile"
+                   },
+                   {
+                       "name":  "auth-api",
+                       "dockerfile":  "backend/src/Services/Auth/Auth.Api/Dockerfile"
+                   },
+                   {
+                       "name":  "chat-api",
+                       "dockerfile":  "backend/src/Services/Chat/Chat.Api/Dockerfile"
+                   },
+                   {
+                       "name":  "product-commands",
+                       "dockerfile":  "backend/src/Services/Product/Product.Commands.Api/Dockerfile"
+                   },
+                   {
+                       "name":  "product-queries",
+                       "dockerfile":  "backend/src/Services/Product/Product.Queries.Api/Dockerfile"
+                   },
+                   {
+                       "name":  "product-projection-worker",
+                       "dockerfile":  "backend/src/Services/Product/Product.Projection.Worker/Dockerfile"
+                   },
+                   {
+                       "name":  "cart-commands",
+                       "dockerfile":  "backend/src/Services/Cart/Cart.Commands.Api/Dockerfile"
+                   },
+                   {
+                       "name":  "cart-queries",
+                       "dockerfile":  "backend/src/Services/Cart/Cart.Queries.Api/Dockerfile"
+                   },
+                   {
+                       "name":  "cart-projection-worker",
+                       "dockerfile":  "backend/src/Services/Cart/Cart.Projection.Worker/Dockerfile"
+                   },
+                   {
+                       "name":  "order-commands",
+                       "dockerfile":  "backend/src/Services/Order/Order.Commands.Api/Dockerfile"
+                   },
+                   {
+                       "name":  "order-queries",
+                       "dockerfile":  "backend/src/Services/Order/Order.Queries.Api/Dockerfile"
+                   },
+                   {
+                       "name":  "order-projection-worker",
+                       "dockerfile":  "backend/src/Services/Order/Order.Projection.Worker/Dockerfile"
+                   },
+                   {
+                       "name":  "order-integration-worker",
+                       "dockerfile":  "backend/src/Services/Order/Order.Integration.Worker/Dockerfile"
+                   },
+                   {
+                       "name":  "payment-commands",
+                       "dockerfile":  "backend/src/Services/Payment/Payment.Commands.Api/Dockerfile"
+                   },
+                   {
+                       "name":  "payment-queries",
+                       "dockerfile":  "backend/src/Services/Payment/Payment.Queries.Api/Dockerfile"
+                   },
+                   {
+                       "name":  "payment-projection-worker",
+                       "dockerfile":  "backend/src/Services/Payment/Payment.Projection.Worker/Dockerfile"
+                   },
+                   {
+                       "name":  "user-commands",
+                       "dockerfile":  "backend/src/Services/User/User.Commands.Api/Dockerfile"
+                   },
+                   {
+                       "name":  "user-queries",
+                       "dockerfile":  "backend/src/Services/User/User.Queries.Api/Dockerfile"
+                   },
+                   {
+                       "name":  "user-projection-worker",
+                       "dockerfile":  "backend/src/Services/User/User.Projection.Worker/Dockerfile"
+                   },
+                   {
+                       "name":  "inventory-commands",
+                       "dockerfile":  "backend/src/Services/Inventory/Inventory.Commands.Api/Dockerfile"
+                   },
+                   {
+                       "name":  "inventory-queries",
+                       "dockerfile":  "backend/src/Services/Inventory/Inventory.Queries.Api/Dockerfile"
+                   },
+                   {
+                       "name":  "inventory-integration-worker",
+                       "dockerfile":  "backend/src/Services/Inventory/Inventory.Integration.Worker/Dockerfile"
+                   },
+                   {
+                       "name":  "reporting-queries",
+                       "dockerfile":  "backend/src/Services/Reporting/Reporting.Queries.Api/Dockerfile"
+                   },
+                   {
+                       "name":  "reporting-projection-worker",
+                       "dockerfile":  "backend/src/Services/Reporting/Reporting.Projection.Worker/Dockerfile"
+                   },
+                   {
+                       "name":  "checkout-saga-api",
+                       "dockerfile":  "backend/src/Services/Saga/CheckoutSaga.Api/Dockerfile"
+                   },
+                   {
+                       "name":  "checkout-saga-worker",
+                       "dockerfile":  "backend/src/Services/Saga/CheckoutSaga.Worker/Dockerfile"
+                   },
+                   {
+                       "name":  "audit-projection-worker",
+                       "dockerfile":  "backend/src/Services/Audit/Audit.Projection.Worker/Dockerfile"
+                   },
+                   {
+                       "name":  "db-initializer",
+                       "dockerfile":  "backend/tools/CqrsDemo.DatabaseInitializer/Dockerfile"
+                   },
+                   {
+                       "name":  "shop",
+                       "dockerfile":  "frontend/shop/Dockerfile"
+                   }
+               ]
+}

@@ -1,0 +1,26 @@
+# Template for per-service .NET Dockerfiles (generated output lives next to each .csproj).
+# Do not build this file directly — run scripts/generate-service-dockerfiles.ps1
+
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+COPY backend/CqrsDemo.Distributed.sln ./
+COPY backend/src/ ./src/
+COPY backend/tools/ ./tools/
+
+ARG PUBLISH_PROJECT
+RUN test -n "$PUBLISH_PROJECT"
+RUN dotnet publish "./${PUBLISH_PROJECT}" -c Release -o /app/publish /p:UseAppHost=false
+
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+WORKDIR /app
+
+ARG ENTRY_DLL
+ENV ASPNETCORE_URLS=http://+:8080
+ENV DOTNET_EnableDiagnostics=0
+ENV ENTRY_DLL=${ENTRY_DLL}
+
+COPY --from=build /app/publish .
+
+EXPOSE 8080
+ENTRYPOINT ["sh", "-c", "exec dotnet \"$ENTRY_DLL\""]

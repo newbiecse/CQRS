@@ -1,5 +1,6 @@
 # Build any .NET 8 service from the distributed solution.
-# Example:
+# DEPRECATED: use per-service Dockerfiles (backend/**/Dockerfile).
+# Generate with: scripts/generate-service-dockerfiles.ps1
 #   docker build -f infra/dockerfiles/Dockerfile.dotnet \
 #     --build-arg PROJECT_PATH=src/Gateway/Shop.Gateway.Api/Shop.Gateway.Api.csproj \
 #     --build-arg ENTRY_DLL=Shop.Gateway.Api.dll \

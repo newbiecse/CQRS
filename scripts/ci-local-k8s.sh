@@ -71,50 +71,30 @@ install_ingress_nginx() {
     --wait --timeout 5m
 }
 
-load_images_kind() {
-  local flavor img
+load_images_from_manifest() {
+  local flavor img name
   flavor="$(cluster_flavor)"
-  [[ "$flavor" == "kind" ]] || return 0
+  [[ "$flavor" == "kind" || "$flavor" == "minikube" ]] || return 0
 
-  step "Loading images into kind..."
-  local images=(
-    db-initializer
-    shop-gateway shop-admin-api shop
-    product-commands product-queries product-projection-worker
-    cart-commands cart-queries cart-projection-worker
-    order-commands order-queries order-projection-worker order-integration-worker
-    payment-commands payment-queries payment-projection-worker
-    user-commands user-queries user-projection-worker
-    reporting-queries reporting-projection-worker
-    checkout-saga-api checkout-saga-worker
-    audit-projection-worker
-  )
-  for img in "${images[@]}"; do
-    kind load docker-image "${REGISTRY}/${img}:${TAG}" --name cqrs-demo
-  done
+  command -v jq >/dev/null 2>&1 || { echo "jq required to load images from manifest" >&2; return 1; }
+
+  step "Loading images into $flavor..."
+  while IFS= read -r name; do
+    img="${REGISTRY}/${name}:${TAG}"
+    if [[ "$flavor" == "kind" ]]; then
+      kind load docker-image "$img" --name cqrs-demo
+    else
+      minikube image load "$img"
+    fi
+  done < <(jq -r '.images[].name' "$ROOT/infra/docker/images.manifest.json")
+}
+
+load_images_kind() {
+  load_images_from_manifest
 }
 
 load_images_minikube() {
-  local flavor img
-  flavor="$(cluster_flavor)"
-  [[ "$flavor" == "minikube" ]] || return 0
-
-  step "Loading images into minikube..."
-  local images=(
-    db-initializer
-    shop-gateway shop-admin-api shop
-    product-commands product-queries product-projection-worker
-    cart-commands cart-queries cart-projection-worker
-    order-commands order-queries order-projection-worker order-integration-worker
-    payment-commands payment-queries payment-projection-worker
-    user-commands user-queries user-projection-worker
-    reporting-queries reporting-projection-worker
-    checkout-saga-api checkout-saga-worker
-    audit-projection-worker
-  )
-  for img in "${images[@]}"; do
-    minikube image load "${REGISTRY}/${img}:${TAG}"
-  done
+  :
 }
 
 deploy_infra() {

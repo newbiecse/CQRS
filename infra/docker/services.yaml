@@ -123,6 +123,32 @@ services:
     projectPath: src/Services/Audit/Audit.Projection.Worker/Audit.Projection.Worker.csproj
     entryDll: Audit.Projection.Worker.dll
     kind: worker
+  - name: auth-api
+    projectPath: src/Services/Auth/Auth.Api/Auth.Api.csproj
+    entryDll: Auth.Api.dll
+    kind: api
+    port: 8080
+  - name: chat-api
+    projectPath: src/Services/Chat/Chat.Api/Chat.Api.csproj
+    entryDll: Chat.Api.dll
+    kind: api
+    port: 8080
+  - name: inventory-commands
+    projectPath: src/Services/Inventory/Inventory.Commands.Api/Inventory.Commands.Api.csproj
+    entryDll: Inventory.Commands.Api.dll
+    kind: api
+    port: 8080
+    writeDb: CqrsDemo_Inventory_Write
+  - name: inventory-queries
+    projectPath: src/Services/Inventory/Inventory.Queries.Api/Inventory.Queries.Api.csproj
+    entryDll: Inventory.Queries.Api.dll
+    kind: api
+    port: 8080
+    readDb: CqrsDemo_Inventory_Read
+  - name: inventory-integration-worker
+    projectPath: src/Services/Inventory/Inventory.Integration.Worker/Inventory.Integration.Worker.csproj
+    entryDll: Inventory.Integration.Worker.dll
+    kind: worker
 
 frontends:
   - name: shop

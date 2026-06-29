@@ -91,23 +91,22 @@ function Use-MinikubeDocker {
 
 function Import-ImagesToMinikube([string]$Registry, [string]$Tag) {
     $flavor = Get-ClusterFlavor
-    if ($flavor -ne "minikube") { return }
+    if ($flavor -notin @('minikube', 'kind')) { return }
 
-    Write-Step "Loading images into minikube..."
-    $images = @(
-        "db-initializer",
-        "shop-gateway", "shop-admin-api", "shop",
-        "product-commands", "product-queries", "product-projection-worker",
-        "cart-commands", "cart-queries", "cart-projection-worker",
-        "order-commands", "order-queries", "order-projection-worker", "order-integration-worker",
-        "payment-commands", "payment-queries", "payment-projection-worker",
-        "user-commands", "user-queries", "user-projection-worker",
-        "reporting-queries", "reporting-projection-worker",
-        "checkout-saga-api", "checkout-saga-worker",
-        "audit-projection-worker"
-    )
-    foreach ($image in $images) {
-        minikube image load "${Registry}/${image}:${Tag}"
+    $manifestPath = Join-Path $RepoRoot "infra\docker\images.manifest.json"
+    if (-not (Test-Path $manifestPath)) {
+        throw "Missing $manifestPath — run generate-service-dockerfiles.ps1"
+    }
+
+    $images = (Get-Content $manifestPath -Raw | ConvertFrom-Json).images
+    Write-Step "Loading images into $flavor..."
+    foreach ($img in $images) {
+        $ref = "${Registry}/$($img.name):${Tag}"
+        if ($flavor -eq 'minikube') {
+            minikube image load $ref
+        } else {
+            kind load docker-image $ref --name cqrs-demo
+        }
     }
 }
 
@@ -223,8 +222,10 @@ if ($InfraOnly) {
 }
 
 if (-not $SkipBuild) {
-    if ((Get-ClusterFlavor) -eq "minikube") {
-        Use-MinikubeDocker
+    if ((Get-ClusterFlavor) -in @('minikube', 'kind')) {
+        if ((Get-ClusterFlavor) -eq 'minikube') {
+            Use-MinikubeDocker
+        }
     }
     Build-Images
     Import-ImagesToMinikube -Registry $ImageRegistry -Tag $ImageTag

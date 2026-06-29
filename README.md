@@ -8,22 +8,19 @@ Distributed **CQRS** + **event-driven** microservices with **transactional outbo
 CQRS/
 ├── backend/                      # .NET 8 microservices
 │   ├── src/
-│   │   ├── BuildingBlocks/       # Shared libraries (domain, messaging, rate limiting, …)
-│   │   ├── CqrsDemo.Contracts/   # Integration events & contracts
-│   │   ├── Gateway/              # Shop.Gateway.Api (:5000), Shop.Admin.Api (:5100)
-│   │   └── Services/             # Product, Cart, Order, Payment, User, Auth, Chat, …
-│   ├── tools/
-│   │   └── CqrsDemo.DatabaseInitializer/
+│   │   ├── BuildingBlocks/, CqrsDemo.Contracts/, Gateway/, Services/
+│   │   └── **/Dockerfile            # one per deployable (ownership)
+│   ├── tools/CqrsDemo.DatabaseInitializer/Dockerfile
 │   ├── tests/
 │   └── CqrsDemo.Distributed.sln
 │
 ├── frontend/
-│   ├── admin/                    # Admin portal — Ant Design Pro (Umi) → :8000
-│   └── shop/                     # Shop storefront — Next.js (App Router, SSR) → :3001
+│   ├── admin/                    # Ant Design Pro (Umi) → :8000
+│   └── shop/                     # Next.js SSR → :3001 (+ Dockerfile)
 │
 ├── infra/
-│   ├── docker/                   # Docker Compose (dev / staging / prod overlays)
-│   ├── dockerfiles/              # Container build definitions
+│   ├── docker/                   # Compose + images.manifest.json
+│   ├── dockerfiles/              # Legacy shared templates (deprecated)
 │   ├── k8s/                      # Kustomize — base + overlays (dev, staging, prod)
 │   ├── helm/
 │   │   ├── helmfile.yaml         # Multi-environment Helm orchestration
@@ -272,7 +269,8 @@ CLUSTER_PROVIDER=kind ./scripts/ci-local-k8s.sh
 | `build-backend.ps1` | `dotnet build` entire backend |
 | `start-backend.ps1` / `stop-backend.ps1` | Run/stop all microservices |
 | `run-fe-admin.ps1` / `run-fe-shop.ps1` | Frontend dev servers |
-| `build-container-images.ps1` | Build Docker images for K8s |
+| `build-container-images.ps1` | Build Docker images from per-service Dockerfiles |
+| `generate-service-dockerfiles.ps1` | Regenerate `backend/**/Dockerfile` + `images.manifest.json` |
 | `deploy-local-k8s.ps1` | Deploy full stack to local Kubernetes |
 | `ci-local-k8s.sh` | Same deploy flow for Linux/macOS and GitHub Actions |
 | `generate-helm-values.ps1` | Regenerate Helm `values*.yaml` after adding a service |

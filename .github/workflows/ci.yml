@@ -80,6 +80,9 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Verify image manifest
+        run: test -f infra/docker/images.manifest.json
+
       - name: Build images (smoke)
         env:
           REGISTRY: cqrsdemo
